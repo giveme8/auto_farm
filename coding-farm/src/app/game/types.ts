@@ -2,7 +2,7 @@ export interface UiBridge {
   alert: (title: string, message: string) => Promise<void>;
   confirm: (title: string, message: string) => Promise<boolean>;
 
-  setMsg: (msg: string) => void;
+  setMsg: (msg: UiMessage) => void;
   updateInventory: (inv: any) => void;
   updateSlotLabel: (name: string) => void;
 
@@ -15,3 +15,10 @@ export interface UiBridge {
 
   toggleUnlockTree: (show: boolean) => void;
 }
+
+export type UiMessage =
+  | string
+  | {
+      key: import("@/i18n/core").TranslationKey;
+      params?: Record<string, string | number>;
+    };

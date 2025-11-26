@@ -26,10 +26,10 @@ export function setupReset(app) {
     app.rebuildWorld?.();
 
     // 8. 更新背包 UI
-    app.ui.updateInventory?.();
+    app.ui.updateInventory?.(app.inventory?.getAll?.());
 
     // 9. 显示消息
-    app.ui.setMsg?.("已重置 ⟳");
+    app.ui.setMsg?.({ key: "status.reset" });
 
     console.log("游戏已重置");
   };

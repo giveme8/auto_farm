@@ -1,6 +1,7 @@
 "use client";
 
 import "./ConfirmModal.css";
+import { useI18n } from "./I18nProvider";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -17,6 +18,8 @@ export function ConfirmModal({
   onOk,
   onCancel,
 }: ConfirmModalProps) {
+  const { t } = useI18n();
+
   if (!open) return null;
 
   return (
@@ -48,7 +51,7 @@ export function ConfirmModal({
               color: "white",
             }}
           >
-            取消
+            {t("confirm.cancel")}
           </button>
 
           <button
@@ -62,7 +65,7 @@ export function ConfirmModal({
               color: "white",
             }}
           >
-            删除
+            {t("confirm.ok")}
           </button>
         </div>
       </div>

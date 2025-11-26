@@ -4,6 +4,22 @@ import Slugger from "github-slugger";
 import fs from "fs";
 import path from "path";
 
+interface DocNode {
+  path?: string;
+  children?: DocNode[];
+}
+
+function collectDocPaths(tree: DocNode[]): string[] {
+  const paths: string[] = [];
+
+  for (const node of tree) {
+    if (node.path) paths.push(node.path);
+    if (node.children?.length) paths.push(...collectDocPaths(node.children));
+  }
+
+  return paths;
+}
+
 // ⭐ 修复 marked v17 对 heading token 的复杂 text/raw 格式
 function toPlainText(x: any): string {
   if (!x) return "";
@@ -19,10 +35,10 @@ function toPlainText(x: any): string {
   return String(x);
 }
 
-export default async function DocPage({ params }) {
+export default async function DocPage({ params }: { params: Promise<{ slug: string | string[] }> }) {
   const { slug } = await params;
-
-  const slugArr = Array.isArray(slug) ? slug : [slug];
+  const slugInput = slug ?? [];
+  const slugArr = Array.isArray(slugInput) ? slugInput : [slugInput];
 
   const decoded = slugArr.map((s) => decodeURIComponent(s));
 
@@ -54,4 +70,16 @@ export default async function DocPage({ params }) {
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
+}
+
+export async function generateStaticParams() {
+  const jsonPath = path.join(process.cwd(), "public/doc/docs.json");
+  const raw = fs.readFileSync(jsonPath, "utf8");
+  const tree: DocNode[] = JSON.parse(raw);
+
+  const docPaths = collectDocPaths(tree);
+
+  return docPaths.map((item) => ({
+    slug: item.replace(/\.md$/, "").split("/").map((segment) => segment.trim()),
+  }));
 }

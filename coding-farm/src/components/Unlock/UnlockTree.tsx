@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import styles from "./UnlockTree.module.css";
 import { renderUnlockPixi } from "@/app/game/engine/unlock/unlock-pixi";
+import { useI18n } from "../I18nProvider";
 
 export function UnlockTree({
   appRef,
@@ -14,6 +15,7 @@ export function UnlockTree({
   onClose: () => void;
 }) {
   const graphRef = useRef<HTMLDivElement>(null);
+  const { t } = useI18n();
 
   // --- 渲染科技树 ---
   useEffect(() => {
@@ -26,8 +28,8 @@ export function UnlockTree({
     graphRef.current.innerHTML = "";
 
     // 调用原来的 Pixi 渲染逻辑
-    renderUnlockPixi(app, app.unlockManager.techTree, graphRef.current);
-  }, [open, appRef]);
+    renderUnlockPixi(app, app.unlockManager.techTree, graphRef.current, t);
+  }, [open, appRef, t]);
 
   if (!open) return null;
 
@@ -35,9 +37,9 @@ export function UnlockTree({
     <div className={styles.overlay}>
       <div className={styles.dialog}>
         <div className={styles.header}>
-          <div className={styles.title}>科技树</div>
+          <div className={styles.title}>{t("unlock.title")}</div>
           <button className="secondary" onClick={onClose}>
-            关闭
+            {t("unlock.close")}
           </button>
         </div>
 

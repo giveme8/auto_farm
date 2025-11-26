@@ -203,7 +203,7 @@ export function createGameAPI(app) {
     return true;
   }
 
-  function clear(id) {
+  function clear() {
     app.resetGame();
   }
   // =====================================================
@@ -248,7 +248,7 @@ export function createGameAPI(app) {
   // =====================================================
   // 分身创建
   // =====================================================
-  function spawn(id) {
+  function spawn() {
     const count = entityManager.getCount();
 
     const limit = unlock.getAbilityValue(

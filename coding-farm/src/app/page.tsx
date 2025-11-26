@@ -1,45 +1,87 @@
 // src/app/page.tsx
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { SaveStartModal } from "@/components/SaveStartModal/SaveStartModal";
 import { useAlert } from "@/components/AlertProvider";
 import { useConfirm } from "@/components/ConfirmProvider";
-import { initGame } from "./game/initGame";
 import Script from "next/script";
 import { useConsole } from "@/components/Console/Console";
 
 import HeaderBar from "@/components/Header/Header";
 import { UnlockTree } from "@/components/Unlock/UnlockTree";
 import { initMain } from "./game/initMain";
-import { UiBridge } from "./game/types";
+import { UiBridge, UiMessage } from "./game/types";
+import { useI18n } from "@/components/I18nProvider";
+import type { TranslationKey } from "@/i18n/core";
+
+const ACE_SRC =
+  "https://cdn.jsdelivr.net/npm/ace-builds@1.32.0/src-min-noconflict/ace.js";
+const ACE_EXT_SRC =
+  "https://cdn.jsdelivr.net/npm/ace-builds@1.32.0/src-noconflict/ext-language_tools.js";
+
+const INVENTORY_LABEL_MAP: Record<string, TranslationKey> = {
+  hay: "inventory.hay",
+  wood: "inventory.wood",
+  carrot: "inventory.carrot",
+  pumpkin: "inventory.pumpkin",
+  cactus: "inventory.cactus",
+  gold: "inventory.gold",
+  apple: "inventory.apple",
+  sunflower: "inventory.sunflower",
+  water: "inventory.water",
+  fertilizer: "inventory.fertilizer",
+};
+
+type InventorySnapshot = Record<string, number>;
 
 export default function HomePage() {
   const appRef = useRef<any | null>(null);
   const alert = useAlert();
   const confirm = useConfirm();
+  const { t } = useI18n();
 
   const consoleApi = useConsole();
 
-  const [showTech, setShowTech] = useState(false);
-
-  const [appReady, setAppReady] = useState(0);
-
   const [msg, setMsg] = useState("...");
-  const [slotName, setSlotName] = useState("未使用存档");
-  const [inventory, setInventory] = useState("");
+  const [slotName, setSlotName] = useState<string | null>(null);
+  const [inventory, setInventory] = useState<InventorySnapshot | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [showUnlock, setShowUnlock] = useState(false);
+
+  const slotLabel = slotName ?? t("app.unusedSlot");
+
+  const inventoryLabel = useMemo(() => {
+    if (!inventory) return "";
+
+    const merged = new Map<string, number>();
+
+    for (const [key, rawValue] of Object.entries(inventory)) {
+      const value = Number.isFinite(rawValue) ? (rawValue as number) : 0;
+      const labelKey = INVENTORY_LABEL_MAP[key];
+      const label = labelKey ? t(labelKey) : key;
+      merged.set(label, (merged.get(label) ?? 0) + value);
+    }
+
+    return Array.from(merged.entries())
+      .map(([label, value]) => `${label}(${value})`)
+      .join(" ");
+  }, [inventory, t]);
+
   const ui: UiBridge = {
     alert,
     confirm,
 
-    setMsg: (m) => setMsg(m),
+    setMsg: (m: UiMessage) => {
+      if (typeof m === "string") {
+        setMsg(m);
+        return;
+      }
+      setMsg(t(m.key, m.params));
+    },
 
     updateInventory: (inv) => {
-      setInventory(
-        `草料(${inv.hay}) 木材(${inv.wood}) 胡萝卜(${inv.carrot}) 南瓜(${inv.pumpkin}) 仙人掌(${inv.cactus}) 金币(${inv.gold}) 苹果(${inv.apple}) 向日葵(${inv.sunflower}) 水(${inv.water}) 肥料(${inv.fertilizer})`
-      );
+      setInventory(inv);
     },
 
     updateSlotLabel: (name) => setSlotName(name),
@@ -70,7 +112,7 @@ export default function HomePage() {
       slotName,
       ui: ui,
     });
-    setAppReady((r) => r + 1);
+    setSlotName(slotName);
   };
 
   // 以后 run / reset / save 都可以通过 appRef.current 调用
@@ -80,13 +122,13 @@ export default function HomePage() {
   return (
     <>
       <Script
-        src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.0/src-min-noconflict/ace.js"
+        src={ACE_SRC}
         strategy="afterInteractive"
       />
-
       <Script
-        src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.0/src-noconflict/ext-language_tools.js"
+        src={ACE_EXT_SRC}
         strategy="afterInteractive"
+        id="ace-ext"
       />
 
       {/* 自定义标记：Ace 已经加载完成 */}
@@ -99,8 +141,8 @@ export default function HomePage() {
 
       <HeaderBar
         msg={msg}
-        inventory={inventory}
-        slotName={slotName}
+        inventory={inventoryLabel}
+        slotName={slotLabel}
         isRunning={isRunning}
         onRun={() => appRef.current?.runUserCode()}
         onAbort={() => appRef.current?.abortRun()}
@@ -111,8 +153,8 @@ export default function HomePage() {
 
       <UnlockTree
         appRef={appRef}
-        open={showTech}
-        onClose={() => setShowTech(false)}
+        open={showUnlock}
+        onClose={() => setShowUnlock(false)}
       />
 
       <div id="editor" />

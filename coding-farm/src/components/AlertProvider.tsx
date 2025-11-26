@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 import "./AlertModal.css";
+import { useI18n } from "./I18nProvider";
 
 type AlertContextType = {
   alert: (title: string, message: string) => Promise<void>;
@@ -17,6 +18,7 @@ export const useAlert = () => {
 };
 
 export function AlertProvider({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
@@ -49,7 +51,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
             <div id="alert-message">{message}</div>
             <div id="alert-actions">
               <button id="alert-ok" onClick={close}>
-                确定
+                {t("alert.ok")}
               </button>
             </div>
           </div>

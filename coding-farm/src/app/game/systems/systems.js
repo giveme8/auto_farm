@@ -3,7 +3,6 @@ import { Inventory } from "../engine/inventory/Inventory.js";
 import { EntityManager } from "../engine/entities/EntityManager.js";
 import { CharacterManager } from "../engine/characters/CharacterManager.js";
 import { CropManager } from "../engine/crops/CropManager.js";
-import { Crop } from "../engine/crops/Crop.js";
 import { SoilManager } from "../engine/soil/SoilManager.js";
 import { UnlockManager } from "../engine/unlock/UnlockManager.js";
 import { MazeManager } from "../engine/maze/MazeManager.js";
@@ -14,7 +13,6 @@ import {
 } from "../engine/crops/CropMerge.js";
 import { CropEventBus } from "../engine/crops/CropEventBus.js";
 import { TECH_TREE } from "../data/unlock.js";
-import CONSTANTS from "../engine/core/constants.js";
 import * as PIXI from "pixi.js";
 /**
  * 初始化所有基础系统（背包、实体、角色、作物、土地、科技、迷宫等）
@@ -125,8 +123,8 @@ export function setupSystems(app, saveData = null) {
   });
 
   // 更新背包显示（app.updateInventory 在 UI 中实现）
-  app.inventory.onChange(() => {
-    app.ui.updateInventory?.();
+  app.inventory.onChange((inv) => {
+    app.ui.updateInventory?.(inv);
   });
 }
 

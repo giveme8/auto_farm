@@ -4,7 +4,7 @@ import { renderUnlockPixi } from "./unlock-pixi.js";
 let appRef = null;
 let TECH_TREE_REF = null;
 
-let elOverlay, elGraph, elScroll;
+let elOverlay, elGraph;
 
 // === 新增：判断是否显示 ===
 function isOverlayVisible() {
@@ -19,8 +19,6 @@ export function initUnlockUI(app, TECH_TREE) {
 
   elOverlay = document.getElementById("tech-overlay");
   elGraph = document.getElementById("tech-graph");
-  elScroll = document.getElementById("tech-scroll");
-
   // 绑定按钮
   document
     .getElementById("toggle-tech")
@@ -50,5 +48,18 @@ export function toggleUnlock(show) {
 
 export function updateUnlock() {
   if (!appRef || !elGraph) return;
-  renderUnlockPixi(appRef, TECH_TREE_REF, elGraph);
+  renderUnlockPixi(
+    appRef,
+    TECH_TREE_REF,
+    elGraph,
+    (key, params) => {
+      let str = typeof key === "string" ? key : String(key);
+      if (params && typeof params === "object") {
+        for (const [k, v] of Object.entries(params)) {
+          str = str.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
+        }
+      }
+      return str;
+    }
+  );
 }

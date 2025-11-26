@@ -1,4 +1,5 @@
 // src/app/doc/Sidebar.tsx
+import React from "react";
 import fs from "fs";
 import path from "path";
 import Link from "next/link";
@@ -10,7 +11,7 @@ interface DocNode {
 }
 
 function renderNode(node: DocNode, base: string = "/doc") {
-  const items: JSX.Element[] = [];
+  const items: React.JSX.Element[] = [];
 
   if (node.path) {
     // 去掉 .md

@@ -1,5 +1,4 @@
 // js/game/save.js
-import { Crop } from "../engine/crops/Crop.js";
 
 /**
  * 收集当前游戏状态，生成一个可存储的 JSON

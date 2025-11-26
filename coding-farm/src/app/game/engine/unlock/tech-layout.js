@@ -23,7 +23,7 @@ export function buildTree(TECH_TREE) {
 
   // 找 root：没有任何节点依赖它，就是根节点
   const depended = new Set();
-  TECH_TREE.forEach(n => (n.deps || []).forEach(d => depended.add(n.key)));
+  TECH_TREE.forEach(n => (n.deps || []).forEach(() => depended.add(n.key)));
 
   const roots = TECH_TREE
     .filter(n => !depended.has(n.key))

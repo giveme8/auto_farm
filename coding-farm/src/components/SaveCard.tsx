@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "./SaveCard.module.css";
+import { useI18n } from "./I18nProvider";
 
 export interface SaveCardProps {
   id: number;
@@ -17,21 +18,25 @@ export function SaveCard({
   onLoad,
   onDelete,
 }: SaveCardProps) {
+  const { t } = useI18n();
+
   return (
     <div className={styles.card}>
       <div className={styles.info}>
         <div className={styles.title}>{name}</div>
         <div className={styles.time}>
-          {savedAt ? new Date(savedAt).toLocaleString() : "尚未保存"}
+          {savedAt
+            ? new Date(savedAt).toLocaleString()
+            : t("saveCard.neverSaved")}
         </div>
       </div>
 
       <div className={styles.buttons}>
         <button className={styles.load} onClick={onLoad}>
-          ▶ 加载
+          ▶ {t("saveCard.load")}
         </button>
         <button className={styles.delete} onClick={onDelete}>
-          🗑 删除
+          🗑 {t("saveCard.delete")}
         </button>
       </div>
     </div>

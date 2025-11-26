@@ -10,6 +10,8 @@ import {
 import { useConfirm } from "@/components/ConfirmProvider";
 import { getCurrentTimeString } from "@/utils/time";
 import { SaveCard } from "@/components/SaveCard";
+import { useI18n } from "../I18nProvider";
+import { LanguageSwitcher } from "../LanguageSwitcher";
 
 import styles from "./SaveStartModal.module.css";
 
@@ -30,6 +32,7 @@ export function SaveStartModal({
 }: {
   onStartGame: (info: StartGameParams) => void;
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(true);
   const [showList, setShowList] = useState(false);
   const [slots, setSlots] = useState<SaveSlotMeta[]>([]);
@@ -54,7 +57,7 @@ export function SaveStartModal({
     const newId =
       metaList.length > 0 ? Math.max(...metaList.map((m) => m.id)) + 1 : 1;
 
-    const name = "存档 " + getCurrentTimeString();
+    const name = t("saveStart.autoName", { time: getCurrentTimeString() });
 
     const meta: SaveSlotMeta = { id: newId, name, savedAt: null };
     metaList.push(meta);
@@ -66,7 +69,10 @@ export function SaveStartModal({
 
   /** 删除存档槽 */
   async function deleteSlot(id: number, name: string) {
-    const ok = await confirm("删除存档", `确定删除 “${name}” 吗？`);
+    const ok = await confirm(
+      t("confirm.deleteTitle"),
+      t("confirm.deleteMessage", { name })
+    );
     if (!ok) return;
 
     const metaList = loadSlotMetaList();
@@ -85,28 +91,33 @@ export function SaveStartModal({
   return (
     <div className={styles.overlay}>
       <div className={styles.dialog}>
-        <h2 className={styles.title}>编程农场开源版</h2>
-        <p className={styles.subtitle}>请选择开始方式：</p>
+        <div className={styles.langSwitcher}>
+          <LanguageSwitcher />
+        </div>
+        <h2 className={styles.title}>{t("saveStart.title")}</h2>
+        <p className={styles.subtitle}>{t("saveStart.subtitle")}</p>
 
         <div className={styles.actions}>
           <button className={styles.newGameBtn} onClick={createNewGame}>
-            新游戏
+            {t("saveStart.newGame")}
           </button>
 
           <button className={styles.loadBtn} onClick={() => setShowList(true)}>
-            加载存档
+            {t("saveStart.loadGame")}
           </button>
         </div>
 
         {showList && (
           <div className={styles.saveListWrap}>
             <div className={styles.headerRow}>
-              <div className={styles.saveListTitle}>选择一个存档</div>
+              <div className={styles.saveListTitle}>
+                {t("saveStart.chooseSlot")}
+              </div>
             </div>
 
             <div className={styles.slotList}>
               {slots.length === 0 && (
-                <div className={styles.empty}>暂无存档</div>
+                <div className={styles.empty}>{t("saveStart.empty")}</div>
               )}
 
               {slots.map((slot) => (

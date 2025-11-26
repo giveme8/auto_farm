@@ -25,9 +25,9 @@ export function setupRunner(app) {
 
     // UI：按钮文案用 updateRunButton
     if (v) {
-      app.ui.setMsg("运行中…");
+      app.ui.setMsg({ key: "status.running" });
     } else {
-      app.ui.setMsg?.("已就绪");
+      app.ui.setMsg?.({ key: "status.ready" });
     }
   }
 
@@ -45,7 +45,7 @@ export function setupRunner(app) {
     if (app.runTimeoutHandle) clearTimeout(app.runTimeoutHandle);
 
     setRunning(false);
-    app.ui.setMsg?.("运行已中止 ⛔");
+    app.ui.setMsg?.({ key: "status.aborted" });
   }
 
   /**
@@ -74,7 +74,7 @@ export function setupRunner(app) {
     });
 
     setRunning(true);
-    app.ui.setMsg?.("运行中…");
+    app.ui.setMsg?.({ key: "status.running" });
 
     // ====================================================
     // ⭐ handleWorkerCall 现在能正确使用 app.worker
@@ -100,14 +100,17 @@ export function setupRunner(app) {
         case "complete":
           if (app.runTimeoutHandle) clearTimeout(app.runTimeoutHandle);
           setRunning(false);
-          app.ui.setMsg?.("运行完成");
+          app.ui.setMsg?.({ key: "status.completed" });
 
           break;
 
         case "error":
           if (app.runTimeoutHandle) clearTimeout(app.runTimeoutHandle);
           setRunning(false);
-          app.ui.setMsg?.("代码错误 ⛔" + data.error);
+          app.ui.setMsg?.({
+            key: "status.error",
+            params: { error: data.error || "" },
+          });
 
           break;
       }
@@ -125,7 +128,7 @@ export function setupRunner(app) {
     if (app.runTimeoutMs > 0) {
       app.runTimeoutHandle = setTimeout(() => {
         abortRun();
-        app.ui.setMsg?.("运行超时 ⏰");
+        app.ui.setMsg?.({ key: "status.timeout" });
       }, app.runTimeoutMs);
     }
   }

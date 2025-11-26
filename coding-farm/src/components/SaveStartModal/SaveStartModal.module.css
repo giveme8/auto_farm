@@ -29,6 +29,14 @@
   z-index: 2;
 }
 
+.langSwitcher {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .title {
   font-size: 32px;
   margin: 0 0 14px;

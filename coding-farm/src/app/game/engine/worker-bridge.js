@@ -15,11 +15,8 @@ export function handleWorkerCallFactory(ctx) {
   const createMaze = ctx.createMaze?.bind(ctx);
   const loadCodingFeatures = ctx.loadCodingFeatures?.bind(ctx);
 
-  const till = ctx.till?.bind(ctx);
-  const useWater = ctx.useWater?.bind(ctx);
   const getWater = ctx.getWater?.bind(ctx);
 
-  const useFertilizer = ctx.useFertilizer?.bind(ctx);
   const getGroundType = ctx.getGroundType?.bind(ctx);
   const measure = ctx.measure?.bind(ctx);
   const getCropType = ctx.getCropType?.bind(ctx);
@@ -30,7 +27,6 @@ export function handleWorkerCallFactory(ctx) {
 
 
   const app = ctx;        // 保留兼容
-  const msg = ctx.msg;
 
   return function handleWorkerCall(data, worker) {
     const { name, args, reqId } = data;

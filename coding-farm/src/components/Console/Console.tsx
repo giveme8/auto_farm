@@ -9,6 +9,7 @@ import {
   useEffect,
 } from "react";
 import styles from "./Console.module.css";
+import { useI18n } from "../I18nProvider";
 
 type LogItem = {
   time: string;
@@ -30,6 +31,7 @@ export const useConsole = () => {
 };
 
 export function ConsoleProvider({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
   const [logs, setLogs] = useState<LogItem[]>([]);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -85,7 +87,7 @@ export function ConsoleProvider({ children }: { children: ReactNode }) {
 
       <div className={styles.consolePanel}>
         <details open className={styles.consoleDetails}>
-          <summary className={styles.summary}>控制台输出</summary>
+          <summary className={styles.summary}>{t("console.title")}</summary>
           <div className={styles.output} ref={ref}>
             {logs.map((log, i) => (
               <div key={i} className={styles.logLine}>
@@ -96,7 +98,7 @@ export function ConsoleProvider({ children }: { children: ReactNode }) {
                     color: log.source === "user" ? "#4caf50" : "#03a9f4",
                   }}
                 >
-                  {log.source === "user" ? "[用户]" : "[系统]"}
+                  {log.source === "user" ? t("console.user") : t("console.system")}
                 </span>
                 <pre className={styles.logBody}>{log.body}</pre>
               </div>
