@@ -1,0 +1,60 @@
+name: Build Next.js and Release Electron App
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Manual version/tag (e.g. v0.1.0)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+env:
+  APP_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || github.event.inputs.version || format('build-{0}', github.run_number) }}
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  build-and-package:
+    name: Build and Package (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: coding-farm/package-lock.json
+
+      - name: Install dependencies
+        working-directory: coding-farm
+        run: npm ci
+
+      - name: Build Next.js (static export)
+        working-directory: coding-farm
+        run: |
+          npm run build
+
+      - name: Package And Publish Electron app
+        uses: anyerqi/electron-website@v0.1.6
+        with:
+          site-path: coding-farm/out
+          app-name: coding-farm
+          product-name: "Coding Farm"
+          app-version: ${{ env.APP_VERSION }}
+          app-description: "JavaScript coding farm game"
+          author: ${{ github.repository_owner }}
+          auto-update: "true"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
