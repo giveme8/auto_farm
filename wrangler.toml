@@ -5,7 +5,7 @@ assets = { directory = "./coding-farm/out", binding = "ASSETS" }
 
 workers_dev = false
 routes = [
-  { pattern = "autofarm-play.giveme8.com/*", custom_domain = true }
+  { pattern = "autofarm-play.giveme8.com", custom_domain = true }
 ]
 
 [observability]
