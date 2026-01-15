@@ -1,0 +1,11 @@
+{
+  "name": "auto-farm-root",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm --prefix coding-farm install",
+    "dev": "npm --prefix coding-farm run dev",
+    "build": "npm --prefix coding-farm run build",
+    "start": "npm --prefix coding-farm run start",
+    "lint": "npm --prefix coding-farm run lint"
+  }
+}

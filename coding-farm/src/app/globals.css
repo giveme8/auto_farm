@@ -102,7 +102,5 @@ canvas {
   background: #333;
   border: 2px solid #555;
   width: 90%;
-  height: 90%;
-  max-width: 520px;
-  max-height: 520px;
+  height: 90%; 
 }

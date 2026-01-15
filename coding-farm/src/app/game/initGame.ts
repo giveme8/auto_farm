@@ -50,6 +50,11 @@ export async function initGame({
   app.currentSlotName = slotName;
   app.ui = ui; // ⭐ 把 React 注入进来的 alert/confirm 挂上去
 
+  // ⭐ 绑定日志输出函数（供 runner 和其他模块调用）
+  app.appendLog = (args: any[], source: "user" | "system" = "user") => {
+    ui.console.log(args, source);
+  };
+
   // 初始化 UI 显示（存档名）
   app.ui.updateSlotLabel("当前存档：" + slotName);
 
@@ -62,11 +67,11 @@ export async function initGame({
 
   setupReset(app);
 
-  app.api = createGameAPI(app);
-
   app.drawGrid = () => drawGrid(app);
   app.rebuildWorld = () => rebuildWorld(app);
   app.setWorldSize = (size: number) => setWorldSize(app, size);
+
+  app.api = createGameAPI(app);
 
   app.collectSaveData = () => collectSaveData(app);
   app.restoreGameState = (data: any) => restoreGameState(app, data);

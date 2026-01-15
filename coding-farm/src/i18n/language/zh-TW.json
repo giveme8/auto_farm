@@ -25,6 +25,9 @@
   "console.title": "控制台輸出",
   "console.user": "[用戶]",
   "console.system": "[系統]",
+  "console.expand": "展開控制台",
+  "console.collapse": "收起控制台",
+  "console.welcome": "歡迎來到編程農場！使用 console.log() 在此輸出資訊。",
   "status.running": "運行中…",
   "status.ready": "已就緒",
   "status.aborted": "運行已中止 ⛔",
@@ -32,6 +35,7 @@
   "status.error": "程式錯誤 ⛔{error}",
   "status.timeout": "運行超時 ⏰",
   "status.reset": "已重置 ⟳",
+  "status.saved": "已儲存 ✓",
   "unlock.tooltip.feature": "【功能介紹】",
   "unlock.tooltip.currentLevel": "【當前等級】",
   "unlock.tooltip.locked": "未解鎖",
@@ -113,5 +117,9 @@
   "inventory.apple": "蘋果",
   "inventory.sunflower": "向日葵",
   "inventory.water": "水",
-  "inventory.fertilizer": "肥料"
+  "inventory.fertilizer": "肥料",
+  "mobile.landscapeTitle": "請旋轉到橫屏",
+  "mobile.landscapeHint": "為獲得最佳體驗，請將裝置旋轉到橫屏。",
+  "mobile.toggleEditor": "切換編輯器",
+  "mobile.editorTitle": "程式碼編輯器"
 }

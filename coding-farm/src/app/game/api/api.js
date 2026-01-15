@@ -338,6 +338,7 @@ export function createGameAPI(app) {
   // 地图大小
   // =====================================================
   function setWorldSize(size) {
+    console.log("[api.setWorldSize] called with size:", size, "app.setWorldSize:", typeof app.setWorldSize);
     app.setWorldSize?.(size);
   }
 

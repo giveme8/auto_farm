@@ -25,6 +25,9 @@
   "console.title": "Console Output",
   "console.user": "[User]",
   "console.system": "[System]",
+  "console.expand": "Expand console",
+  "console.collapse": "Collapse console",
+  "console.welcome": "Welcome to Coding Farm! Use console.log() to output messages here.",
   "status.running": "Running…",
   "status.ready": "Ready",
   "status.aborted": "Run aborted ⛔",
@@ -32,6 +35,7 @@
   "status.error": "Code error ⛔ {error}",
   "status.timeout": "Run timed out ⏰",
   "status.reset": "Reset done ⟳",
+  "status.saved": "Game saved ✓",
   "unlock.tooltip.feature": "Feature",
   "unlock.tooltip.currentLevel": "Current Level",
   "unlock.tooltip.locked": "Locked",
@@ -113,5 +117,9 @@
   "inventory.apple": "Apple",
   "inventory.sunflower": "Sunflower",
   "inventory.water": "Water",
-  "inventory.fertilizer": "Fertilizer"
+  "inventory.fertilizer": "Fertilizer",
+  "mobile.landscapeTitle": "Landscape required",
+  "mobile.landscapeHint": "Rotate your device to landscape to continue.",
+  "mobile.toggleEditor": "Toggle editor",
+  "mobile.editorTitle": "Code Editor"
 }

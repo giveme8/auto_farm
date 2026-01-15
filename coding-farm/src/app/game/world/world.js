@@ -51,22 +51,28 @@ export function rebuildWorld(app) {
  * 设置世界尺寸（公共 API）
  */
 export function setWorldSize(app, size) {
+  console.log("[world.setWorldSize] called with size:", size);
+  
   // 科技限制
   const expandSize = app.unlockManager.getAbilityValue(
     CONSTANTS.UNLOCKS.Expand,
-    "世界尺寸",
+    "unlock.ability.worldSize",
     3
   );
+  console.log("[world.setWorldSize] expandSize limit:", expandSize);
 
   if (size < 3) {
+    console.log("[world.setWorldSize] rejected: size < 3");
     app.appendLog?.(["世界尺寸不能小于 3"], "system");
     return;
   }
   if (size > expandSize) {
+    console.log("[world.setWorldSize] rejected: size > expandSize");
     app.appendLog?.([`世界尺寸不能超过 ${expandSize}`], "system");
     return;
   }
 
+  console.log("[world.setWorldSize] proceeding with size:", size);
   // 修改 gameState 内部尺寸
   app.gameState.setWorldSize(size, app.view.width);
 

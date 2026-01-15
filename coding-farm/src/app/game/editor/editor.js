@@ -8,6 +8,8 @@ export async function setupEditor(app, saveData = null) {
   const initialCode = saveData?.editor?.code || DEFAULT_CODE;
   editor.setValue(initialCode, -1);
 
+  // 使用本地 ACE 资源
+  ace.config.set("basePath", "/ace");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/javascript");
   editor.setOptions({
@@ -21,6 +23,15 @@ export async function setupEditor(app, saveData = null) {
 
   // 将 editor 挂到 app 上（方便 save/restore 使用）
   app.editor = editor;
+
+  // 延迟调用 resize 确保编辑器在移动端抽屉等场景下正确渲染
+  setTimeout(() => {
+    try {
+      editor.resize();
+    } catch (e) {
+      // 忽略 resize 错误，编辑器打开时会再次 resize
+    }
+  }, 100);
 }
 
 // -------------------------

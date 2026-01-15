@@ -74,12 +74,14 @@ export function renderUnlockPixi(app, TECH_TREE, graphEl, t = (key) => key) {
     techApp.uiLayer = new PIXI.Container();
     techApp.uiLayer.zIndex = 9999;
     techApp.stage.addChild(techApp.uiLayer);
-
-    graphEl.innerHTML = "";
-    graphEl.appendChild(techApp.view);
   } else {
     techApp.renderer.resize(graphW, graphH);
   }
+
+  // 每次都确保 canvas 被添加到当前的 graphEl 中
+  // （因为关闭对话框后 DOM 会被移除，重新打开时需要重新挂载）
+  graphEl.innerHTML = "";
+  graphEl.appendChild(techApp.view);
 
   // === 清空图层 ===
   techApp.graphLayer.removeChildren();

@@ -74,7 +74,6 @@ export function setupRunner(app) {
     });
 
     setRunning(true);
-    app.ui.setMsg?.({ key: "status.running" });
 
     // ====================================================
     // ⭐ handleWorkerCall 现在能正确使用 app.worker
