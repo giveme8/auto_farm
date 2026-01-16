@@ -1,4 +1,4 @@
-name = "auto-farm"
+name = "autofarmplayonline"
 main = "cf-worker/index.js"
 compatibility_date = "2024-11-01"
 assets = { directory = "./coding-farm/out", binding = "ASSETS" }
