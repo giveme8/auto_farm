@@ -11,62 +11,100 @@ import { CactusCrop } from "./CactusCrop.js";
 import { SunFlowerCrop } from "./SunFlowerCrop.js";
 import { Crop } from "./Crop.js";
 import CONSTANTS from "../core/constants.js";
+import {
+  buildCropTypeLookup,
+  getCurrentLocale,
+  getLocalizedCropType,
+} from "../../i18n/commands/index.js";
+import { getTranslator } from "../../i18n/language/index.js";
+
+let cachedLocale = null;
+let cachedLookup = new Map();
+
+const t = (key, params) => getTranslator()(key, undefined, params);
+
+function getCropTypeLookup() {
+  const locale = getCurrentLocale();
+  if (locale !== cachedLocale) {
+    cachedLocale = locale;
+    cachedLookup = buildCropTypeLookup(locale, { includeAll: true });
+  }
+  return cachedLookup;
+}
+
+export function resolveCropType(type) {
+  const raw = String(type ?? "").trim();
+  if (!raw) return "";
+  const key = raw.toLowerCase();
+  const resolved = getCropTypeLookup().get(key);
+  if (resolved) return resolved;
+  if (key.endsWith("s")) {
+    const singular = key.slice(0, -1);
+    return getCropTypeLookup().get(singular) || raw;
+  }
+  return raw;
+}
+
+export function localizeCropType(type) {
+  const locale = getCurrentLocale();
+  return getLocalizedCropType(type, locale);
+}
 
 export const CROP_TYPES = {
-  土豆: {
+  potato: {
     time: 3000,
     item: "potato",
     unlock: CONSTANTS.UNLOCKS.Potato,
     renderer: new PotatoCrop(),
   },
 
-  花生: {
+  peanut: {
     time: 5000,
     item: "peanut",
     unlock: CONSTANTS.UNLOCKS.Peanut,
     renderer: null, // 还没做 PeanutCrop，可以先留空
   },
 
-  南瓜: {
+  pumpkin: {
     time: 7000,
     item: "pumpkin",
     unlock: CONSTANTS.UNLOCKS.Pumpkins,
     renderer: new PumpkinCrop(),
   },
 
-  草: {
+  grass: {
     time: 0,
     item: "hay",
     unlock: CONSTANTS.UNLOCKS.Grass,
     renderer: new HayCrop(),
   },
-  灌木丛: {
+  bush: {
     time: 0,
     item: "wood",
     unlock: CONSTANTS.UNLOCKS.Trees,
     renderer: new BushCrop(),
   },
-  胡萝卜: {
+  carrot: {
     time: 0,
     item: "carrot",
     unlock: CONSTANTS.UNLOCKS.Carrots,
     renderer: new CarrotCrop(),
     cost: { hay: 512, wood: 512 },
   },
-  树: {
+  tree: {
     time: 0,
     item: "wood",
     unlock: CONSTANTS.UNLOCKS.Trees,
     renderer: new TreeCrop(),
   },
-  仙人掌: {
+  cactus: {
     time: 0,
     item: "cactus",
     unlock: CONSTANTS.UNLOCKS.Cactus,
     renderer: new CactusCrop(),
     cost: { pumpkin: 64 },
   },
-  向日葵: {
+  sunflower: {
     time: 0,
     item: "sunflower",
     unlock: CONSTANTS.UNLOCKS.Sunflowers,
@@ -131,8 +169,9 @@ export class CropManager {
   import(cropList) {
     this.reset();
     cropList.forEach((c) => {
+      const resolvedType = resolveCropType(c.type);
       const crop = new Crop({
-        type: c.type,
+        type: resolvedType,
         plantedAt: c.plantedAt,
         matureTime: c.matureTime,
         key: `${c.x}_${c.y}`,
@@ -167,12 +206,12 @@ export class CropManager {
   plantWeed(x, y, mul) {
     const key = this.key(x, y);
     if (this.exist(x, y)) {
-      console.warn("已种有作物，无法种杂草:", key);
+      console.warn(t("log.weedPlantBlocked", { key }));
       return;
     }
 
     const weedCrop = new Crop({
-      type: "草",
+      type: "grass",
       key: `${x}_${y}`,
       plantedAt: Date.now(),
       matureTime: 0,
@@ -209,9 +248,11 @@ export class CropManager {
 
         seen.add(key);
 
-        const renderer = CROP_TYPES[crop.type].renderer;
+        const resolvedType = resolveCropType(crop.type);
+        const cropConfig = CROP_TYPES[resolvedType];
+        const renderer = cropConfig?.renderer;
         if (!renderer) {
-          console.warn("未知作物类型:", crop.type);
+          console.warn(t("log.unknownCropType", { type: crop.type }));
           continue;
         }
 

@@ -10,5 +10,5 @@ export class CarrotCrop extends CropBase {
     });
   }
 
-  get type() { return '胡萝卜'; }
+  get type() { return 'carrot'; }
 }

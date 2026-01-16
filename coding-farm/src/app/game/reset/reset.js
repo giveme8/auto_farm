@@ -1,4 +1,8 @@
 // js/game/reset.js
+import { getCurrentLocale } from "@/i18n/commands";
+import { translate } from "@/i18n/core";
+
+const t = (key, params) => translate(getCurrentLocale(), key, params);
 
 export function setupReset(app) {
   app.resetGame = () => {
@@ -31,6 +35,6 @@ export function setupReset(app) {
     // 9. 显示消息
     app.ui.setMsg?.({ key: "status.reset" });
 
-    console.log("游戏已重置");
+    console.log(t("log.gameReset"));
   };
 }

@@ -1,0 +1,136 @@
+{
+  "cropTypes": {
+    "potato": [
+      "\u99ac\u9234\u85af",
+      "\u571f\u8c46"
+    ],
+    "peanut": [
+      "\u82b1\u751f"
+    ],
+    "pumpkin": [
+      "\u5357\u74dc"
+    ],
+    "grass": [
+      "\u8349"
+    ],
+    "bush": [
+      "\u704c\u6728\u53e2"
+    ],
+    "carrot": [
+      "\u80e1\u863f\u8514"
+    ],
+    "tree": [
+      "\u6a39"
+    ],
+    "cactus": [
+      "\u4ed9\u4eba\u638c"
+    ],
+    "sunflower": [
+      "\u5411\u65e5\u8475"
+    ]
+  },
+  "unlockNames": {
+    "auto_unlock": [
+      "\u81ea\u52a8\u89e3\u9501"
+    ],
+    "cactus": [
+      "\u4ed9\u4eba\u638c"
+    ],
+    "carrots": [
+      "\u80e1\u863f\u8514"
+    ],
+    "costs": [
+      "\u6210\u672c"
+    ],
+    "debug": [
+      "console.log()"
+    ],
+    "debug_2": [
+      "\u8c03\u8bd5\u9ad8\u7ea7"
+    ],
+    "dictionaries": [
+      "{'a':1, 'b':2}"
+    ],
+    "snake": [
+      "\u86c7"
+    ],
+    "expand": [
+      "\u64f4\u5efa"
+    ],
+    "fertilizer": [
+      "\u80a5\u6599"
+    ],
+    "functions": [
+      "function() {}"
+    ],
+    "grass": [
+      "\u8349"
+    ],
+    "dino": [
+      "\u5c0f\u6050\u9f8d"
+    ],
+    "import": [
+      "\u5bfc\u5165\u529f\u80fd"
+    ],
+    "leaderboard": [
+      "\u6392\u884c\u699c"
+    ],
+    "lists": [
+      "[1,2,3]"
+    ],
+    "loops": [
+      "while"
+    ],
+    "mazes": [
+      "\u8ff7\u5bae"
+    ],
+    "megafarm": [
+      "\u5de8\u578b\u8fb2\u5834"
+    ],
+    "operators": [
+      "1 + 1"
+    ],
+    "plant": [
+      "plant()"
+    ],
+    "polyculture": [
+      "\u591a\u79cd\u683d\u57f9"
+    ],
+    "pumpkins": [
+      "\u5357\u74dc"
+    ],
+    "senses": [
+      "(x,y)"
+    ],
+    "simulation": [
+      "\u6a21\u62df"
+    ],
+    "speed": [
+      "\u901f\u5ea6"
+    ],
+    "sunflowers": [
+      "\u5411\u65e5\u8475"
+    ],
+    "remains": [
+      "\u8fb2\u592b\u7684\u907a\u9aa8"
+    ],
+    "timing": [
+      "\u8ba1\u65f6"
+    ],
+    "top_hat": [
+      "\u9ad8\u793c\u5e3d\u76ae\u80a4"
+    ],
+    "trees": [
+      "\u6a39"
+    ],
+    "utilities": [
+      "random()"
+    ],
+    "variables": [
+      "let a = 2"
+    ],
+    "watering": [
+      "\u6f86\u6c34"
+    ]
+  }
+}

@@ -5,10 +5,10 @@ import { AlertProvider } from "../components/AlertProvider"; // Adjust the path 
 import { ConfirmProvider } from "@/components/ConfirmProvider";
 import { ConsoleProvider } from "@/components/Console/Console";
 import { I18nProvider } from "@/components/I18nProvider";
-import { defaultLocale } from "@/i18n/core";
+import { defaultLocale, translate } from "@/i18n/core";
 export const metadata: Metadata = {
-  title: "编程农场开源版",
-  description: "编程农场开源版 - 使用 JavaScript 编程的农场游戏",
+  title: translate(defaultLocale, "app.title"),
+  description: translate(defaultLocale, "app.description"),
 };
 
 export default function RootLayout({

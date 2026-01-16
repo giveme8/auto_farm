@@ -3,9 +3,11 @@
 import { getCurrentTimeString } from "../utils/time.js";
 
 import { confirmModal } from "./confirm.js";
+import { getTranslator } from "../i18n/language/index.js";
 
 const SAVE_META_KEY = "farm_save_slots";
 const SAVE_SLOT_PREFIX = "farm_save_slot_";
+const t = (key, params) => getTranslator()(key, undefined, params);
 
 export function loadSlotMetaList() {
   try {
@@ -48,7 +50,7 @@ export function initStartUI({ onStartGame, onCollectSave }) {
   const btnCreateEmpty = document.getElementById("btn-create-empty");
 
   if (!overlay) {
-    console.warn("Start overlay missing");
+    console.warn(t("log.startOverlayMissing"));
     return;
   }
 

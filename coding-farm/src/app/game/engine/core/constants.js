@@ -36,53 +36,14 @@ export const UNLOCKS = {
 
 };
 
-export const UNLOCKS_NAME_ZH = {
-  [UNLOCKS.AutoUnlock]: "自动解锁",
-  [UNLOCKS.Cactus]: "仙人掌",
-  [UNLOCKS.Carrots]: "胡萝卜",
-  [UNLOCKS.Costs]: "成本",
-  [UNLOCKS.Debug]: "调试",
-  [UNLOCKS.Debug_2]: "调试高级",
-  [UNLOCKS.Dictionaries]: "字典（对象）",
-  [UNLOCKS.Snake]: "蛇模式",
-  [UNLOCKS.Expand]: "世界扩展",
-  [UNLOCKS.Fertilizer]: "肥料",
-  [UNLOCKS.Functions]: "函数",
-  [UNLOCKS.Grass]: "草",
-  [UNLOCKS.Dino]: "恐龙",
-  [UNLOCKS.Import]: "导入功能",
-  [UNLOCKS.Leaderboard]: "排行榜",
-  [UNLOCKS.Lists]: "列表（数组）",
-  [UNLOCKS.Loops]: "循环",
-  [UNLOCKS.Mazes]: "迷宫",
-  [UNLOCKS.Megafarm]: "巨型农场",
-  [UNLOCKS.Operators]: "运算符",
-  [UNLOCKS.Plant]: "种植",
-  [UNLOCKS.Polyculture]: "多种栽培",
-  [UNLOCKS.Pumpkins]: "南瓜",
-  [UNLOCKS.Senses]: "感知能力",
-  [UNLOCKS.Simulation]: "模拟",
-  [UNLOCKS.Speed]: "速度",
-  [UNLOCKS.Sunflowers]: "向日葵",
-  [UNLOCKS.Remains]: "残余",
-  [UNLOCKS.Timing]: "计时",
-  [UNLOCKS.TopHat]: "高礼帽皮肤",
-  [UNLOCKS.Trees]: "树",
-  [UNLOCKS.Utilities]: "工具库",
-  [UNLOCKS.Variables]: "变量",
-  [UNLOCKS.Watering]: "浇水",
-};
-
-
 export const CROP_TYPE_NAMES = {
-  Cactus: "仙人掌",
-  Carrots: "胡萝卜",
-  Pumpkins: "南瓜",
-  Sunflowers: "向日葵",
-  Trees: "树",
-  Grass: "草",
-  Bush: "灌木丛",
-  
+  Cactus: "cactus",
+  Carrots: "carrot",
+  Pumpkins: "pumpkin",
+  Sunflowers: "sunflower",
+  Trees: "tree",
+  Grass: "grass",
+  Bush: "bush",
 };
 
 /*potato: 0,
@@ -97,13 +58,13 @@ export const CROP_TYPE_NAMES = {
       cactus:0,
       sunflower:0, */
 export const CROP_TYPE_ITEM_MAPPING = {
-  Cactus: "cactus",
-  Carrots: "carrot",
-  Pumpkins: "pumpkin",
-  Sunflowers: "sunflower",
-  Trees: "wood",
-  Grass: "hay",
-  Bush: "wood",
+  cactus: "cactus",
+  carrot: "carrot",
+  pumpkin: "pumpkin",
+  sunflower: "sunflower",
+  tree: "wood",
+  grass: "hay",
+  bush: "wood",
 }
 
 export const DIRECTIONS = {
@@ -125,5 +86,4 @@ export default {
   DIRECTIONS,
   CHARACTER_TYPES,
   CROP_TYPE_ITEM_MAPPING,
-  UNLOCKS_NAME_ZH,
 }

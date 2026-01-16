@@ -2,10 +2,14 @@
 import { GameState } from "../engine/core/GameState.js";
 import { CropDebugRenderer } from "../engine/crops/CropDebugRenderer.js";
 import * as PIXI from "pixi.js";
+import { getCurrentLocale } from "@/i18n/commands";
+import { translate } from "@/i18n/core";
 /**
  * 初始化 Pixi 应用、canvas 绑定、基本 gameState
  */
 export function setupPixi(app, saveData = null) {
+  const locale = getCurrentLocale();
+  const t = (key, params) => translate(locale, key, params);
   const canvasEl = document.getElementById("map");
   const viewW = canvasEl?.width || 400;
   const viewH = canvasEl?.height || 400;
@@ -13,7 +17,7 @@ export function setupPixi(app, saveData = null) {
   console.log("DOM has map?", document.getElementById("map"));
 
   if (!canvasEl) {
-    console.error("❌ canvas #map 未找到，Pixi 初始化失败！");
+    console.error(t("error.canvasMissing"));
     return;
   }
 

@@ -11,6 +11,6 @@ export class CactusCrop extends CropBase {
   }
 
   get type() {
-    return "仙人掌";
+    return "cactus";
   }
 }

@@ -20,7 +20,7 @@ export class Entity {
       case 'left': this.x--; break;
       case 'right': this.x++; break;
       default:
-        throw new Error('未知方向: ' + direction);
+        throw new Error('Unknown direction: ' + direction);
     }
 
     const wrap = v => ((v % worldSize) + worldSize) % worldSize;

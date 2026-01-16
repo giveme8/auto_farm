@@ -11,6 +11,6 @@ export class SunFlowerCrop extends CropBase {
   }
 
   get type() {
-    return "向日葵";
+    return "sunflower";
   }
 }

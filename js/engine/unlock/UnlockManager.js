@@ -27,7 +27,11 @@ export class UnlockManager {
       result[node.key] = this.isUnlocked(node.key);
     }
 
-    result["speed"] = this.getAbilityValue("speed", "速度倍率", 1);
+    result["speed"] = this.getAbilityValue(
+      "speed",
+      "unlock.ability.speedMultiplier",
+      1
+    );
 
     return result;
   }
@@ -182,7 +186,7 @@ export class UnlockManager {
 
   /**
    * 获取指定科技的某个 ability 数值
-   * 例如：getAbilityValue("speed", "行动速度倍率", 1)
+   * 例如：getAbilityValue("speed", "unlock.ability.speedMultiplier", 1)
    */
   getAbilityValue(key, abilityName, defaultValue = 0) {
     const map = this.getAbilityMap(key);

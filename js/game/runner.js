@@ -1,6 +1,11 @@
 // js/game/runner.js
 import { handleWorkerCallFactory } from "../engine/worker-bridge.js";
 import CONSTANTS from "../engine/core/constants.js";
+import {
+  getAllCropTypeAliases,
+  getCurrentLocale,
+  getUnlockNameAliases,
+} from "../i18n/commands/index.js";
 
 /**
  * 负责运行用户代码的 worker 初始化、中止、回调绑定
@@ -71,6 +76,13 @@ export function setupRunner(app) {
     app.worker.postMessage({
       type: "init_constants",
       constants: CONSTANTS,
+    });
+    const locale = getCurrentLocale();
+    app.worker.postMessage({
+      type: "init_commands",
+      locale,
+      cropTypes: getAllCropTypeAliases(),
+      unlockNames: getUnlockNameAliases(locale),
     });
 
     setRunning(true);

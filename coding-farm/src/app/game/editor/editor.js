@@ -1,11 +1,56 @@
 // js/game/editor.js
-import { DEFAULT_CODE } from "../data/default_code.js";
+import { getDefaultCode } from "../data/default_code.js";
+import { getCropTypeAliases, getCurrentLocale } from "@/i18n/commands";
+import { translate } from "@/i18n/core";
+
+const NUM_ITEM_LABELS = [
+  ["pumpkin", "inventory.pumpkin"],
+  ["gold", "inventory.gold"],
+  ["apple", "inventory.apple"],
+  ["hay", "inventory.hay"],
+  ["wood", "inventory.wood"],
+  ["carrot", "inventory.carrot"],
+  ["cactus", "inventory.cactus"],
+  ["sunflower", "inventory.sunflower"],
+  ["water", "inventory.water"],
+  ["fertilizer", "inventory.fertilizer"],
+];
+
+function buildNumItemsDoc(t) {
+  const lines = [
+    "<b>numItems(itemType)</b><br/>",
+    `${t("editor.completion.numItems.desc")}<br/><br/>`,
+    `<b>${t("editor.completion.numItems.paramLabel", { name: "itemType" })}</b><br/>`,
+    `${t("editor.completion.numItems.options")}<br/>`,
+    "<code>",
+  ];
+
+  for (const [item, labelKey] of NUM_ITEM_LABELS) {
+    lines.push(`  "${item}"   ${t(labelKey)}<br/>`);
+  }
+
+  lines.push("</code><br/>");
+  lines.push(
+    `<b>${t("editor.completion.numItems.returnLabel")}</b> ${t(
+      "editor.completion.numItems.returnValue"
+    )}`
+  );
+
+  return lines.join("\n");
+}
 
 export async function setupEditor(app, saveData = null) {
   const editor = ace.edit("editor");
 
   // 设置初始化代码（支持从存档恢复）
-  const initialCode = saveData?.editor?.code || DEFAULT_CODE;
+  const locale = getCurrentLocale();
+  const cropAliases = getCropTypeAliases(locale);
+  const initialCode =
+    saveData?.editor?.code ||
+    getDefaultCode({
+      potato: cropAliases.potato?.[0],
+      pumpkin: cropAliases.pumpkin?.[0],
+    });
   editor.setValue(initialCode, -1);
 
   // 使用本地 ACE 资源
@@ -40,113 +85,113 @@ export async function setupEditor(app, saveData = null) {
 function setupCustomCompletions() {
   const customCompleter = {
     getCompletions(editor, session, pos, prefix, callback) {
+      const locale = getCurrentLocale();
+      const cropAliases = getCropTypeAliases(locale);
+      const potato = cropAliases.potato?.[0] || "potato";
+      const t = (key, params) => translate(locale, key, params);
+      const metaGameApi = t("editor.completion.metaGameApi");
+      const numItemsDoc = buildNumItemsDoc(t);
+
       const list = [
-        { caption: "till", value: "till()", meta: "game api" },
-        { caption: "useWater", value: "useWater()", meta: "game api" },
-        { caption: "getWater", value: "getWater()", meta: "game api" },
-        { caption: "getWorldSize", value: "getWorldSize()", meta: "game api" },
+        { caption: "till", value: "till()", meta: metaGameApi },
+        { caption: "useWater", value: "useWater()", meta: metaGameApi },
+        { caption: "getWater", value: "getWater()", meta: metaGameApi },
+        { caption: "getWorldSize", value: "getWorldSize()", meta: metaGameApi },
         {
           caption: "useFertilizer",
           value: "useFertilizer()",
-          meta: "game api",
+          meta: metaGameApi,
         },
         {
           caption: "getGroundType",
           value: "getGroundType()",
-          meta: "game api",
+          meta: metaGameApi,
         },
-        { caption: "getCropType", value: "getCropType()", meta: "game api" },
-        { caption: "canHarvest", value: "canHarvest()", meta: "game api" },
-        { caption: "canMove", value: "canMove()", meta: "game api" },
-        { caption: "clear", value: "clear()", meta: "game api" },
-        { caption: "random", value: "random()", meta: "game api" },
-        { caption: "max", value: "max()", meta: "game api" },
-        { caption: "min", value: "min()", meta: "game api" },
-        { caption: "abs", value: "abs()", meta: "game api" },
+        { caption: "getCropType", value: "getCropType()", meta: metaGameApi },
+        { caption: "canHarvest", value: "canHarvest()", meta: metaGameApi },
+        { caption: "canMove", value: "canMove()", meta: metaGameApi },
+        { caption: "clear", value: "clear()", meta: metaGameApi },
+        { caption: "random", value: "random()", meta: metaGameApi },
+        { caption: "max", value: "max()", meta: metaGameApi },
+        { caption: "min", value: "min()", meta: metaGameApi },
+        { caption: "abs", value: "abs()", meta: metaGameApi },
         {
           caption: "getMaxEntityCount",
           value: "getMaxEntityCount()",
-          meta: "game api",
+          meta: metaGameApi,
         },
         {
           caption: "getEntityCount",
           value: "getEntityCount()",
-          meta: "game api",
+          meta: metaGameApi,
         },
         {
           caption: "numItems",
           value: "numItems(itemType)",
-          meta: "game api",
-          docHTML: `
-    <b>numItems(itemType)</b><br/>
-    获取背包中指定物品的数量。<br/><br/>
-    <b>参数 itemType（字符串）：</b><br/>
-    可以是以下之一：<br/>
-    <code>
-      "pumpkin"   南瓜<br/>
-      "gold"      金币<br/>
-      "apple"     苹果<br/>
-      "hay"       草料<br/>
-      "wood"      木头<br/>
-      "carrot"    胡萝卜<br/>
-      "cactus"    仙人掌<br/>
-      "sunflower" 向日葵<br/>
-      "water"     水<br/>
-      "fertilizer" 肥料<br/>
-    </code><br/>
-    <b>返回值：</b> 数字，当前拥有的数量。
-  `,
+          meta: metaGameApi,
+          docHTML: numItemsDoc,
         },
 
-        { caption: "measure", value: "measure()", meta: "game api" },
+        { caption: "measure", value: "measure()", meta: metaGameApi },
 
         {
           caption: "console.log(msg)",
           value: "console.log('hello world')",
-          meta: "game api",
-          docHTML: "<b>console.log(msg)</b><br/>打印消息到控制台。",
+          meta: metaGameApi,
+          docHTML: `<b>console.log(msg)</b><br/>${t(
+            "editor.completion.consoleLog"
+          )}`,
         },
         {
           caption: "move(dir)",
           value: "move('up')",
-          meta: "game api",
+          meta: metaGameApi,
           docHTML:
-            "<b>move(dir)</b><br/>角色移动：'up'/'down'/'left'/'right'。",
+            `<b>move(dir)</b><br/>${t("editor.completion.move")}`,
         },
 
         {
           caption: "setWorldSize(size)",
           value: "setWorldSize(10)",
-          meta: "game api",
-          docHTML: "<b>setWorldSize(size)</b><br/>修改地图尺寸。",
+          meta: metaGameApi,
+          docHTML: `<b>setWorldSize(size)</b><br/>${t(
+            "editor.completion.setWorldSize"
+          )}`,
         },
 
         {
           caption: "createMaze(n)",
           value: "createMaze(3)",
-          meta: "game api",
-          docHTML: "<b>createMaze(n)</b><br/>生成迷宫。",
+          meta: metaGameApi,
+          docHTML: `<b>createMaze(n)</b><br/>${t(
+            "editor.completion.createMaze"
+          )}`,
         },
 
         {
           caption: "plant(type)",
-          value: "plant('土豆')",
-          meta: "game api",
-          docHTML: "<b>plant(type)</b><br/>种植作物。",
+          value: `plant('${potato}')`,
+          meta: metaGameApi,
+          docHTML:
+            `<b>plant(type)</b><br/>${t("editor.completion.plant")}`,
         },
 
         {
           caption: "harvest()",
           value: "harvest()",
-          meta: "game api",
-          docHTML: "<b>harvest()</b><br/>收获作物。",
+          meta: metaGameApi,
+          docHTML: `<b>harvest()</b><br/>${t(
+            "editor.completion.harvest"
+          )}`,
         },
 
         {
           caption: "changeCharacter(type)",
           value: "changeCharacter('dino')",
-          meta: "game api",
-          docHTML: "<b>changeCharacter(type)</b><br/>切换角色外观。",
+          meta: metaGameApi,
+          docHTML: `<b>changeCharacter(type)</b><br/>${t(
+            "editor.completion.changeCharacter"
+          )}`,
         },
 
         {
@@ -154,10 +199,12 @@ function setupCustomCompletions() {
           meta: "snippet",
           value: `spawn(async ({ move, plant, harvest, id }) => {
   await move(0, 1)
-  await plant('土豆')
+  await plant('${potato}')
   await harvest()
 })`,
-          docHTML: "<b>spawn(callback)</b><br/>创建一个分身，可并行运行。",
+          docHTML: `<b>spawn(callback)</b><br/>${t(
+            "editor.completion.spawn"
+          )}`,
         },
       ];
 

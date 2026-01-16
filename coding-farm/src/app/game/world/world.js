@@ -1,5 +1,9 @@
 // js/game/world.js
 import CONSTANTS from "../engine/core/constants.js";
+import { getCurrentLocale } from "@/i18n/commands";
+import { translate } from "@/i18n/core";
+
+const t = (key, params) => translate(getCurrentLocale(), key, params);
 
 /**
  * 绘制网格
@@ -44,7 +48,7 @@ export function rebuildWorld(app) {
   app.characterManager.clear();
   app.characterManager.update(app.entityManager.getAll(), size, tile);
 
-  console.log("地图已重绘");
+  console.log(t("log.worldRebuilt"));
 }
 
 /**
@@ -63,12 +67,12 @@ export function setWorldSize(app, size) {
 
   if (size < 3) {
     console.log("[world.setWorldSize] rejected: size < 3");
-    app.appendLog?.(["世界尺寸不能小于 3"], "system");
+    app.appendLog?.([t("log.worldSizeTooSmall", { min: 3 })], "system");
     return;
   }
   if (size > expandSize) {
     console.log("[world.setWorldSize] rejected: size > expandSize");
-    app.appendLog?.([`世界尺寸不能超过 ${expandSize}`], "system");
+    app.appendLog?.([t("log.worldSizeTooLarge", { max: expandSize })], "system");
     return;
   }
 
@@ -79,4 +83,3 @@ export function setWorldSize(app, size) {
   // 重建世界
   rebuildWorld(app);
 }
-

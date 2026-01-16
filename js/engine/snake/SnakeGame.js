@@ -5,6 +5,9 @@ import { SnakeBase } from "./SnakeBase.js";
 import { SnakeManager } from "./SnakeManager.js";
 import { SnakeController } from "./SnakeController.js";
 import { makeSnakeTextures } from "./snakeTextures.js";
+import { getTranslator } from "../../i18n/language/index.js";
+
+const t = (key, params) => getTranslator()(key, undefined, params);
 
 export class SnakeGame {
   constructor(app, { startX, startY }) {
@@ -77,7 +80,7 @@ export class SnakeGame {
   step(dir) {
     const alive = this.controller.step(dir);
     if (!alive) {
-      console.warn("Snake died! Restarting...");
+      console.warn(t("log.snakeDiedRestarting"));
       this.app.inventory.add("apple", this.model.len() - 1);
       this.restart();
     }

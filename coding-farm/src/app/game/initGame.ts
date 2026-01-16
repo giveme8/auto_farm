@@ -18,6 +18,8 @@ import {
 } from "@/utils/storage"; // 原来在 ui/save-ui.js 里的那几个函数
 import { renderAllMazes } from "./engine/maze/renderMaze";
 import type { UiBridge } from "./types";
+import { getCurrentLocale } from "@/i18n/commands";
+import { translate } from "@/i18n/core";
 
 export interface InitGameOptions {
   saveData: any;
@@ -49,6 +51,9 @@ export async function initGame({
   app.currentSlotId = slotId;
   app.currentSlotName = slotName;
   app.ui = ui; // ⭐ 把 React 注入进来的 alert/confirm 挂上去
+  const locale = getCurrentLocale();
+  const t = (key: any, params?: Record<string, string | number>) =>
+    translate(locale, key, params);
 
   // ⭐ 绑定日志输出函数（供 runner 和其他模块调用）
   app.appendLog = (args: any[], source: "user" | "system" = "user") => {
@@ -56,7 +61,9 @@ export async function initGame({
   };
 
   // 初始化 UI 显示（存档名）
-  app.ui.updateSlotLabel("当前存档：" + slotName);
+  app.ui.updateSlotLabel(
+    t("ui.currentSlotLabel", { slot: slotName })
+  );
 
   app.pendingFrameReqs = [];
 
@@ -91,13 +98,13 @@ export async function initGame({
     const metaList = loadSlotMetaList();
 
     if (!app.currentSlotId) {
-      await ui.alert("提示", "当前没有选择存档槽，无法保存！");
+      await ui.alert(t("alert.title"), t("alert.noSlotSelected"));
       return;
     }
 
     const slot = metaList.find((m: any) => m.id === app.currentSlotId);
     if (!slot) {
-      await ui.alert("提示", "存档槽不存在！");
+      await ui.alert(t("alert.title"), t("alert.slotNotFound"));
       return;
     }
 
@@ -107,7 +114,10 @@ export async function initGame({
     saveSlotData(slot.id, data);
     saveSlotMetaList(metaList);
 
-    await ui.alert("提示", `已保存到 “${slot.name}”`);
+    await ui.alert(
+      t("alert.title"),
+      t("alert.savedToSlot", { slot: slot.name })
+    );
   };
 
   return app;

@@ -11,6 +11,6 @@ export class TreeCrop extends CropBase {
   }
 
   get type() {
-    return "树";
+    return "tree";
   }
 }

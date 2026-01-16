@@ -1,11 +1,38 @@
 // js/unlock/unlock-pixi.js
 
 import { buildTree, layoutTree } from "./tech-layout.js";
+import { getCurrentLocale } from "../../i18n/commands/index.js";
+import { getTranslator } from "../../i18n/language/index.js";
+
+const inventoryNameKeyMap = {
+  hay: "inventory.hay",
+  wood: "inventory.wood",
+  carrot: "inventory.carrot",
+  pumpkin: "inventory.pumpkin",
+  cactus: "inventory.cactus",
+  gold: "inventory.gold",
+  apple: "inventory.apple",
+  sunflower: "inventory.sunflower",
+  water: "inventory.water",
+  fertilizer: "inventory.fertilizer",
+};
 
 let techApp = null;
 
 export function renderUnlockPixi(app, TECH_TREE, graphEl) {
   const unlockMgr = app.unlockManager;
+  const tr = getTranslator(getCurrentLocale());
+  const labelSeparator = tr("unlock.prompt.labelSeparator", ":");
+  const lockedLabel = tr("unlock.prompt.locked", "Locked");
+
+  const getNodeName = (node) =>
+    tr(`unlock.${node?.key}.name`, node?.name || node?.key || "");
+  const getNodeDesc = (node) =>
+    tr(`unlock.${node?.key}.desc`, node?.desc || "");
+  const getAbilityName = (ability) =>
+    tr(ability?.name, ability?.name || "");
+  const getItemName = (item) =>
+    tr(inventoryNameKeyMap[item], item);
 
   // 构建树结构
   const { roots, map } = buildTree(TECH_TREE);
@@ -87,49 +114,64 @@ export function renderUnlockPixi(app, TECH_TREE, graphEl) {
     let lines = [];
 
     // --- 描述 ---
-    if (node.desc) {
-      lines.push(`【功能介绍】`);
+    const desc = getNodeDesc(node);
+    if (desc) {
+      lines.push(tr("unlock.prompt.intro", "Feature"));
       lines.push("");
-      lines.push("　　" + node.desc);
+      lines.push("　　" + desc);
       lines.push("");
     }
 
     // --- 当前等级 ---
-    lines.push(`【当前等级】${curLv >= 0 ? curLv+1 : "未解锁"}`);
+    const levelLabel = curLv >= 0 ? curLv + 1 : lockedLabel;
+    lines.push(
+      tr(
+        "unlock.prompt.currentLevel",
+        `Current Level: ${levelLabel}`,
+        { level: levelLabel }
+      )
+    );
 
     // --- 当前效果 ---
     if (curAbility && curAbility.length > 0) {
-      lines.push("【当前效果】");
+      lines.push(tr("unlock.prompt.currentEffect", "Current Effect"));
       lines.push("");
       curAbility.forEach((a) => {
-        lines.push(`  • ${a.name}：${a.value}`);
+        lines.push(
+          `  • ${getAbilityName(a)}${labelSeparator}${a.value}`
+        );
       });
     }
 
     // --- 升级材料 ---
     if (requires) {
       lines.push("");
-      lines.push("【升级需要】");
+      lines.push(tr("unlock.prompt.upgradeNeeds", "Upgrade Needs"));
       lines.push("");
       Object.entries(requires).forEach(([item, qty]) => {
-        lines.push(`  • ${item}: ${qty}`);
+        lines.push(
+          `  • ${getItemName(item)}${labelSeparator}${qty}`
+        );
       });
     }
 
     // --- 升级后效果 ---
     if (nextAbility && nextAbility.length > 0) {
       lines.push("");
-      lines.push("【升级后效果】");
+      lines.push(tr("unlock.prompt.nextEffect", "Next Effect"));
       lines.push("");
       nextAbility.forEach((a) => {
-        lines.push(`  • ${a.name}：${(a.value * 100).toFixed(0) + "%"}`);
+        const value = (a.value * 100).toFixed(0) + "%";
+        lines.push(
+          `  • ${getAbilityName(a)}${labelSeparator}${value}`
+        );
       });
     }
 
     // --- 已满级 ---
     if (!nextLevelObj) {
       lines.push("");
-      lines.push("已达最高等级");
+      lines.push(tr("unlock.prompt.maxLevel", "Max level reached"));
     }
 
     tooltipText.text = lines.join("\n");
@@ -167,7 +209,10 @@ export function renderUnlockPixi(app, TECH_TREE, graphEl) {
       }
     }
 
-    console.log(`❌ 无法升级 ${node.name}`);
+    const name = getNodeName(node);
+    console.log(
+      tr("log.upgradeFailed", `❌ Unable to upgrade ${name}`, { name })
+    );
   }
 
   // 画线条
@@ -238,7 +283,8 @@ export function renderUnlockPixi(app, TECH_TREE, graphEl) {
     }
 
     // 名字
-    const t = new PIXI.Text(node.name, {
+    const displayName = getNodeName(node);
+    const t = new PIXI.Text(displayName, {
       fill: "#fff",
       fontSize: 20,
     });

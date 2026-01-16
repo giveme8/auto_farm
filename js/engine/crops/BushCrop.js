@@ -10,5 +10,5 @@ export class BushCrop extends CropBase {
     });
   }
 
-  get type() { return '灌木丛'; }
+  get type() { return 'bush'; }
 }

@@ -1,0 +1,135 @@
+{
+  "cropTypes": {
+    "potato": [
+      "\u571f\u8c46"
+    ],
+    "peanut": [
+      "\u82b1\u751f"
+    ],
+    "pumpkin": [
+      "\u5357\u74dc"
+    ],
+    "grass": [
+      "\u8349"
+    ],
+    "bush": [
+      "\u704c\u6728\u4e1b"
+    ],
+    "carrot": [
+      "\u80e1\u841d\u535c"
+    ],
+    "tree": [
+      "\u6811"
+    ],
+    "cactus": [
+      "\u4ed9\u4eba\u638c"
+    ],
+    "sunflower": [
+      "\u5411\u65e5\u8475"
+    ]
+  },
+  "unlockNames": {
+    "auto_unlock": [
+      "\u81ea\u52a8\u89e3\u9501"
+    ],
+    "cactus": [
+      "\u4ed9\u4eba\u638c"
+    ],
+    "carrots": [
+      "\u80e1\u841d\u535c"
+    ],
+    "costs": [
+      "\u6210\u672c"
+    ],
+    "debug": [
+      "\u8c03\u8bd5"
+    ],
+    "debug_2": [
+      "\u8c03\u8bd5\u9ad8\u7ea7"
+    ],
+    "dictionaries": [
+      "\u5b57\u5178\uff08\u5bf9\u8c61\uff09"
+    ],
+    "snake": [
+      "\u86c7\u6a21\u5f0f"
+    ],
+    "expand": [
+      "\u4e16\u754c\u6269\u5c55"
+    ],
+    "fertilizer": [
+      "\u80a5\u6599"
+    ],
+    "functions": [
+      "\u51fd\u6570"
+    ],
+    "grass": [
+      "\u8349"
+    ],
+    "dino": [
+      "\u6050\u9f99"
+    ],
+    "import": [
+      "\u5bfc\u5165\u529f\u80fd"
+    ],
+    "leaderboard": [
+      "\u6392\u884c\u699c"
+    ],
+    "lists": [
+      "\u5217\u8868\uff08\u6570\u7ec4\uff09"
+    ],
+    "loops": [
+      "\u5faa\u73af"
+    ],
+    "mazes": [
+      "\u8ff7\u5bab"
+    ],
+    "megafarm": [
+      "\u5de8\u578b\u519c\u573a"
+    ],
+    "operators": [
+      "\u8fd0\u7b97\u7b26"
+    ],
+    "plant": [
+      "\u79cd\u690d"
+    ],
+    "polyculture": [
+      "\u591a\u79cd\u683d\u57f9"
+    ],
+    "pumpkins": [
+      "\u5357\u74dc"
+    ],
+    "senses": [
+      "\u611f\u77e5\u80fd\u529b"
+    ],
+    "simulation": [
+      "\u6a21\u62df"
+    ],
+    "speed": [
+      "\u901f\u5ea6"
+    ],
+    "sunflowers": [
+      "\u5411\u65e5\u8475"
+    ],
+    "remains": [
+      "\u6b8b\u4f59"
+    ],
+    "timing": [
+      "\u8ba1\u65f6"
+    ],
+    "top_hat": [
+      "\u9ad8\u793c\u5e3d\u76ae\u80a4"
+    ],
+    "trees": [
+      "\u6811"
+    ],
+    "utilities": [
+      "\u5de5\u5177\u5e93"
+    ],
+    "variables": [
+      "\u53d8\u91cf"
+    ],
+    "watering": [
+      "\u6d47\u6c34"
+    ]
+  }
+}

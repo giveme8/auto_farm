@@ -26,7 +26,7 @@ export function setupLoop(app) {
       // 水资源自动产出
       const waterGain = app.unlockManager.getAbilityValue(
         CONSTANTS.UNLOCKS.Watering,
-        "水资源每秒产出",
+        "unlock.ability.waterPerSec",
         0
       );
       app.inventory.add("water", waterGain);
@@ -51,7 +51,7 @@ export function setupLoop(app) {
     if (app.soilManager) {
       const mul = app.unlockManager.getAbilityValue(
         CONSTANTS.UNLOCKS.Grass,
-        "产量倍率",
+        "unlock.ability.yieldMultiplier",
         1
       );
       app.soilManager.update(app.cropManager, { mul });

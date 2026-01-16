@@ -10,5 +10,5 @@ export class PumpkinCrop extends CropBase {
     });
   }
 
-  get type() { return '南瓜'; }
+  get type() { return 'pumpkin'; }
 }

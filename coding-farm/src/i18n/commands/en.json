@@ -1,0 +1,143 @@
+{
+  "cropTypes": {
+    "potato": [
+      "potato",
+      "potatoes"
+    ],
+    "peanut": [
+      "peanut",
+      "peanuts"
+    ],
+    "pumpkin": [
+      "pumpkin",
+      "pumpkins"
+    ],
+    "grass": [
+      "grass"
+    ],
+    "bush": [
+      "bush",
+      "bushes"
+    ],
+    "carrot": [
+      "carrot",
+      "carrots"
+    ],
+    "tree": [
+      "tree",
+      "trees"
+    ],
+    "cactus": [
+      "cactus",
+      "cacti"
+    ],
+    "sunflower": [
+      "sunflower",
+      "sunflowers"
+    ]
+  },
+  "unlockNames": {
+    "auto_unlock": [
+      "Auto Unlock"
+    ],
+    "cactus": [
+      "Cactus"
+    ],
+    "carrots": [
+      "Carrot"
+    ],
+    "costs": [
+      "Costs"
+    ],
+    "debug": [
+      "console.log()"
+    ],
+    "debug_2": [
+      "Debug Advanced"
+    ],
+    "dictionaries": [
+      "Dictionaries"
+    ],
+    "snake": [
+      "Snake"
+    ],
+    "expand": [
+      "Expansion"
+    ],
+    "fertilizer": [
+      "Fertilizer"
+    ],
+    "functions": [
+      "Functions"
+    ],
+    "grass": [
+      "Grass"
+    ],
+    "dino": [
+      "Baby Dino"
+    ],
+    "import": [
+      "Import"
+    ],
+    "leaderboard": [
+      "Leaderboard"
+    ],
+    "lists": [
+      "Lists"
+    ],
+    "loops": [
+      "Loops"
+    ],
+    "mazes": [
+      "Maze"
+    ],
+    "megafarm": [
+      "Mega Farm"
+    ],
+    "operators": [
+      "Operators"
+    ],
+    "plant": [
+      "Planting"
+    ],
+    "polyculture": [
+      "Polyculture"
+    ],
+    "pumpkins": [
+      "Pumpkin"
+    ],
+    "senses": [
+      "Sensors"
+    ],
+    "simulation": [
+      "Simulation"
+    ],
+    "speed": [
+      "Speed"
+    ],
+    "sunflowers": [
+      "Sunflower"
+    ],
+    "remains": [
+      "Farmer's Remains"
+    ],
+    "timing": [
+      "Timing"
+    ],
+    "top_hat": [
+      "Top Hat"
+    ],
+    "trees": [
+      "Trees"
+    ],
+    "utilities": [
+      "Utilities"
+    ],
+    "variables": [
+      "Variables"
+    ],
+    "watering": [
+      "Watering"
+    ]
+  }
+}

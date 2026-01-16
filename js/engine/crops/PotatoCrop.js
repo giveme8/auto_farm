@@ -10,5 +10,5 @@ export class PotatoCrop extends CropBase {
     });
   }
 
-  get type() { return '土豆'; }
+  get type() { return 'potato'; }
 }

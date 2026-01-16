@@ -1,6 +1,12 @@
 // js/game/runner.js
 import { handleWorkerCallFactory } from "../engine/worker-bridge.js";
 import CONSTANTS from "../engine/core/constants.js";
+import {
+  getAllCropTypeAliases,
+  getCurrentLocale,
+  getUnlockNameAliases,
+} from "@/i18n/commands";
+import { translate } from "@/i18n/core";
 
 /**
  * 负责运行用户代码的 worker 初始化、中止、回调绑定
@@ -71,6 +77,31 @@ export function setupRunner(app) {
     app.worker.postMessage({
       type: "init_constants",
       constants: CONSTANTS,
+    });
+    const locale = getCurrentLocale();
+    const featureChecks = {
+      consoleLogLocked: translate(locale, "worker.feature.consoleLogLocked"),
+      dictionariesLocked: translate(
+        locale,
+        "worker.feature.dictionariesLocked"
+      ),
+      functionsLocked: translate(locale, "worker.feature.functionLocked"),
+      arrowFunctionsLocked: translate(
+        locale,
+        "worker.feature.arrowFunctionLocked"
+      ),
+      listsLocked: translate(locale, "worker.feature.listLocked"),
+      whileLoopsLocked: translate(locale, "worker.feature.whileLoopLocked"),
+      forLoopsLocked: translate(locale, "worker.feature.forLoopLocked"),
+      operatorsLocked: translate(locale, "worker.feature.operatorsLocked"),
+      variablesLocked: translate(locale, "worker.feature.variablesLocked"),
+    };
+    app.worker.postMessage({
+      type: "init_commands",
+      locale,
+      cropTypes: getAllCropTypeAliases(),
+      unlockNames: getUnlockNameAliases(locale),
+      featureChecks,
     });
 
     setRunning(true);

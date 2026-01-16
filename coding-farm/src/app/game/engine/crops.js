@@ -1,7 +1,8 @@
 // engine/crops.js
-import { cropsLayer } from './layers.js';
-import { getPotatoFramesMeta } from './potato.js';
-import { smooth, smoothScale, tweenAlpha, tweenScale } from '../utils/tween.js';
+import { cropsLayer } from "./layers.js";
+import { getPotatoFramesMeta } from "./potato.js";
+import { resolveCropType } from "./crops/CropManager.js";
+import { smooth, smoothScale, tweenAlpha, tweenScale } from "../utils/tween.js";
 
 const cropSprites = new Map();
 
@@ -17,7 +18,8 @@ export function drawCrops({ crops, mapSize, tileSize }) {
       if (!crop) continue;
       seen.add(key);
 
-      if (crop.type === '土豆') {
+      const resolvedType = resolveCropType(crop.type);
+      if (resolvedType === "potato") {
         renderPotato(crop, key, x, screenY, tileSize, now);
       } else {
         // TODO: 其它作物的画法，先省略或用 Graphics
@@ -86,8 +88,8 @@ function renderPotato(crop, key, x, screenY, tileSize, now) {
     tweenAlpha(newSprite, 1, 150);
     tweenScale(newSprite, targetScale, 200);
   } else {
-    smooth(sprite, 'x', targetX);
-    smooth(sprite, 'y', targetY);
+    smooth(sprite, "x", targetX);
+    smooth(sprite, "y", targetY);
     smoothScale(sprite, targetScale);
   }
 }

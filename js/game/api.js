@@ -1,12 +1,18 @@
 // js/game/api.js
 
-import { CROP_TYPES } from "../engine/crops/CropManager.js";
+import {
+  CROP_TYPES,
+  localizeCropType,
+  resolveCropType,
+} from "../engine/crops/CropManager.js";
 import {Crop} from "../engine/crops/Crop.js";
 import CONSTANTS from "../engine/core/constants.js";
+import { getTranslator } from "../i18n/language/index.js";
 /**
  * 构建所有游戏 API（供 worker 与 UI 调用）
  */
 export function createGameAPI(app) {
+  const t = (key, params) => getTranslator()(key, undefined, params);
   const entityManager = app.entityManager;
   const cropManager = app.cropManager;
   const soil = app.soilManager;
@@ -80,7 +86,10 @@ export function createGameAPI(app) {
   function getCropType(id) {
     const e = entityManager.getEntity(id);
     if (!e) return;
-    return cropManager.get(e.x, e.y)?.type;
+    const cropType = cropManager.get(e.x, e.y)?.type;
+    if (!cropType) return;
+    const resolvedType = resolveCropType(cropType);
+    return localizeCropType(resolvedType);
   }
 
   // =====================================================
@@ -146,10 +155,19 @@ export function createGameAPI(app) {
     if (mazeManager.isInMaze(e.x, e.y)) return;
     if (cropManager.exist(e.x, e.y)) return;
 
+    const rawType = String(type ?? "").trim();
+    const resolvedType = resolveCropType(rawType);
+    const cropConfig = CROP_TYPES[resolvedType];
+    if (!cropConfig) {
+      console.warn(t("log.unknownCropType", { type: rawType }));
+      appendSystemLog?.(`❌ 未知作物类型：${rawType}`);
+      return;
+    }
+
     // 成本检查
-    if (CROP_TYPES[type].cost) {
-      for (const item in CROP_TYPES[type].cost) {
-        const need = CROP_TYPES[type].cost[item];
+    if (cropConfig.cost) {
+      for (const item in cropConfig.cost) {
+        const need = cropConfig.cost[item];
         if (inventory.get(item) < need) {
           console.log(`❌ 材料不足：${item} ${need}`);
           appendSystemLog(`❌ 材料不足：${item} ${need}`);
@@ -157,23 +175,27 @@ export function createGameAPI(app) {
         }
       }
 
-      for (const item in CROP_TYPES[type].cost) {
-        inventory.remove(item, CROP_TYPES[type].cost[item]);
+      for (const item in cropConfig.cost) {
+        inventory.remove(item, cropConfig.cost[item]);
       }
     }
 
-    let matureTime = CROP_TYPES[type]?.time || 0;
+    let matureTime = cropConfig.time || 0;
     if (!soil.gridIsWet(e.x, e.y)) matureTime *= 1.5;
 
     const crop = new Crop({
-      type,
+      type: resolvedType,
       plantedAt: Date.now(),
       matureTime,
       key: `${e.x}_${e.y}`,
     });
 
     // 按科技倍率调整产量
-    const mul = unlock.getAbilityValue(CROP_TYPES[type].unlock, "产量倍率", 1);
+    const mul = unlock.getAbilityValue(
+      cropConfig.unlock,
+      "unlock.ability.yieldMultiplier",
+      1
+    );
     if (mul !== 1) crop.setYieldMultiplier(mul);
 
     cropManager.set(crop);
@@ -222,7 +244,13 @@ export function createGameAPI(app) {
 
     if (Date.now() - crop.plantedAt < crop.matureTime) return false;
 
-    const item = CROP_TYPES[crop.type].item;
+    const resolvedType = resolveCropType(crop.type);
+    const cropConfig = CROP_TYPES[resolvedType];
+    if (!cropConfig) {
+      console.warn(t("log.unknownCropType", { type: crop.type }));
+      return false;
+    }
+    const item = cropConfig.item;
 
     // 合并区域收割
     if (crop.mergeArea) {
@@ -254,7 +282,11 @@ export function createGameAPI(app) {
    
     const count = entityManager.getCount();
 
-     const limit = unlock.getAbilityValue(CONSTANTS.UNLOCKS.Megafarm, "spawn并发数量", 0);
+     const limit = unlock.getAbilityValue(
+      CONSTANTS.UNLOCKS.Megafarm,
+      "unlock.ability.spawnConcurrency",
+      0
+    );
      if (count >= limit) {
         console.log("❌ 分身数量已达上限");
         appendSystemLog("❌ 分身数量已达上限");
@@ -265,7 +297,11 @@ export function createGameAPI(app) {
 
 
   function getMaxEntityCount() {
-    return unlock.getAbilityValue(CONSTANTS.UNLOCKS.Megafarm, "spawn并发数量", 1);
+    return unlock.getAbilityValue(
+      CONSTANTS.UNLOCKS.Megafarm,
+      "unlock.ability.spawnConcurrency",
+      1
+    );
   }
   function getEntityCount() {
     return entityManager.getCount();

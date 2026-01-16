@@ -22,8 +22,8 @@ let techApp = null;
 export function renderUnlockPixi(app, TECH_TREE, graphEl, t = (key) => key) {
   const unlockMgr = app.unlockManager;
 
-  const tr = (key, fallback = "") =>
-    t ? t(key, undefined) ?? fallback : fallback;
+  const tr = (key, fallback = "", params) =>
+    t ? t(key, params) ?? fallback : fallback;
 
   const getName = (node) =>
     tr(`unlock.${node.key}.name`, node.name || node.key);
@@ -217,7 +217,8 @@ export function renderUnlockPixi(app, TECH_TREE, graphEl, t = (key) => key) {
       }
     }
 
-    console.log(`❌ 无法升级 ${getName(node)}`);
+    const name = getName(node);
+    console.log(tr("log.upgradeFailed", `❌ Unable to upgrade ${name}`, { name }));
   }
 
   // 画线条

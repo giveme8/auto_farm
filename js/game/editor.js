@@ -1,11 +1,19 @@
 // js/game/editor.js
-import { DEFAULT_CODE } from "../data/default_code.js";
+import { getDefaultCode } from "../data/default_code.js";
+import { getCropTypeAliases, getCurrentLocale } from "../i18n/commands/index.js";
 
 export function setupEditor(app, saveData = null) {
   const editor = ace.edit("editor");
 
   // 设置初始化代码（支持从存档恢复）
-  const initialCode = saveData?.editor?.code || DEFAULT_CODE;
+  const locale = getCurrentLocale();
+  const cropAliases = getCropTypeAliases(locale);
+  const initialCode =
+    saveData?.editor?.code ||
+    getDefaultCode({
+      potato: cropAliases.potato?.[0],
+      pumpkin: cropAliases.pumpkin?.[0],
+    });
   editor.setValue(initialCode, -1);
 
   editor.setTheme("ace/theme/monokai");
@@ -27,6 +35,9 @@ export function setupEditor(app, saveData = null) {
 // 自定义 Ace 自动补全
 // -------------------------
 function setupCustomCompletions() {
+  const locale = getCurrentLocale();
+  const cropAliases = getCropTypeAliases(locale);
+  const potato = cropAliases.potato?.[0] || "potato";
   const customCompleter = {
     getCompletions(editor, session, pos, prefix, callback) {
       const list = [
@@ -119,9 +130,10 @@ function setupCustomCompletions() {
 
         {
           caption: "plant(type)",
-          value: "plant('土豆')",
+          value: `plant('${potato}')`,
           meta: "game api",
-          docHTML: "<b>plant(type)</b><br/>种植作物。",
+          docHTML:
+            "<b>plant(type)</b><br/>种植作物（支持当前语言作物名）。",
         },
 
         {
@@ -143,7 +155,7 @@ function setupCustomCompletions() {
           meta: "snippet",
           value: `spawn(async ({ move, plant, harvest, id }) => {
   await move(0, 1)
-  await plant('土豆')
+  await plant('${potato}')
   await harvest()
 })`,
           docHTML: "<b>spawn(callback)</b><br/>创建一个分身，可并行运行。",

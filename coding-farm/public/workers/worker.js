@@ -10,6 +10,10 @@ const chains = new Map();
 const GLOBAL_CHAIN_KEY = "GLOBAL";
 let codingFeatures = null;
 let CONSTANTS = null;
+let cropTypeAliases = null;
+let cropTypeLookup = new Map();
+let unlockNameAliases = null;
+let featureCheckMessages = null;
 
 // 默认动作等待帧数
 const actionWaitFrames = {
@@ -44,6 +48,47 @@ function callMain(name, args = [], expectResponse = false) {
     pending.set(reqId, resolve);
     send(msg);
   });
+}
+
+function normalizeCropTypeKey(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function buildCropTypeLookup() {
+  cropTypeLookup = new Map();
+  const aliases = cropTypeAliases || {};
+  for (const [canonical, list] of Object.entries(aliases)) {
+    if (!Array.isArray(list)) continue;
+    const all = list.slice();
+    all.push(canonical);
+    for (const alias of all) {
+      const key = normalizeCropTypeKey(alias);
+      if (!key) continue;
+      cropTypeLookup.set(key, canonical);
+    }
+  }
+}
+
+function resolveCropType(type) {
+  const key = normalizeCropTypeKey(type);
+  if (!key) return type;
+  const resolved = cropTypeLookup?.get(key);
+  if (resolved) return resolved;
+  if (key.endsWith("s")) {
+    const singular = key.slice(0, -1);
+    return cropTypeLookup?.get(singular) || type;
+  }
+  return type;
+}
+
+function getUnlockName(feature) {
+  const aliases = unlockNameAliases?.[feature];
+  if (Array.isArray(aliases) && aliases.length > 0) return aliases[0];
+  return feature;
+}
+
+function getFeatureCheckMessage(key, fallback) {
+  return featureCheckMessages?.[key] || fallback;
 }
 
 // ===================== 慢速串行执行队列 =====================
@@ -116,15 +161,16 @@ async function move(direction, entityId) {
 }
 
 async function plant(type, entityId) {
-  if (type == CONSTANTS.CROP_TYPE_NAMES.Carrots) {
+  const resolvedType = resolveCropType(type);
+  if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Carrots) {
     requireFeature(CONSTANTS.UNLOCKS.Carrots);
-  } else if (type == CONSTANTS.CROP_TYPE_NAMES.Trees) {
+  } else if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Trees) {
     requireFeature(CONSTANTS.UNLOCKS.Trees);
-  } else if (type == CONSTANTS.CROP_TYPE_NAMES.Pumpkins) {
+  } else if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Pumpkins) {
     requireFeature(CONSTANTS.UNLOCKS.Pumpkins);
-  } else if (type == CONSTANTS.CROP_TYPE_NAMES.Cactus) {
+  } else if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Cactus) {
     requireFeature(CONSTANTS.UNLOCKS.Cactus);
-  } else if (type == CONSTANTS.CROP_TYPE_NAMES.Sunflowers) {
+  } else if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Sunflowers) {
     requireFeature(CONSTANTS.UNLOCKS.Sunflowers);
   } else {
     requireFeature(CONSTANTS.UNLOCKS.Plant);
@@ -223,7 +269,7 @@ async function loadCodingFeatures() {
 
 function requireFeature(feature) {
   if (!codingFeatures?.[feature]) {
-    throw new Error(`${CONSTANTS.UNLOCKS_NAME_ZH[feature]} 功能尚未解锁`);
+    throw new Error(`${feature} is not unlocked yet`);
   }
 }
 
@@ -467,6 +513,7 @@ async function checkUserCodeFeatures(stripped) {
     {
       feature: "debug",
       pattern: /\bconsole\s*\.\s*log\s*\(/,
+      messageKey: "consoleLogLocked",
       message: "console.log 功能尚未解锁",
     },
 
@@ -474,6 +521,7 @@ async function checkUserCodeFeatures(stripped) {
     {
       feature: "dictionaries",
       pattern: /(?:=|\(|return)\s*\{/,
+      messageKey: "dictionariesLocked",
       message: "对象（字典）功能尚未解锁",
     },
 
@@ -481,11 +529,13 @@ async function checkUserCodeFeatures(stripped) {
     {
       feature: "functions",
       pattern: /\bfunction\b/,
+      messageKey: "functionsLocked",
       message: "自定义函数功能尚未解锁",
     },
     {
       feature: "functions",
       pattern: /=\s*\([^)]*\)\s*=>/,
+      messageKey: "arrowFunctionsLocked",
       message: "箭头函数功能尚未解锁",
     },
 
@@ -493,6 +543,7 @@ async function checkUserCodeFeatures(stripped) {
     {
       feature: "lists",
       pattern: /\[[^\]]*\]/,
+      messageKey: "listsLocked",
       message: "数组功能尚未解锁",
     },
 
@@ -500,11 +551,13 @@ async function checkUserCodeFeatures(stripped) {
     {
       feature: "loops",
       pattern: /(^|[^\w])while\s*\(/,
+      messageKey: "whileLoopsLocked",
       message: "while 循环功能尚未解锁",
     },
     {
       feature: "loops",
       pattern: /(^|[^\w])for\s*\(/,
+      messageKey: "forLoopsLocked",
       message: "for 循环功能尚未解锁",
     },
 
@@ -512,6 +565,7 @@ async function checkUserCodeFeatures(stripped) {
     {
       feature: "operators",
       pattern: /[+\-*/%]=?|==|<=|>=|!=|<|>/,
+      messageKey: "operatorsLocked",
       message: "运算符功能尚未解锁（+ - * / % 以及比较运算符)",
     },
 
@@ -519,6 +573,7 @@ async function checkUserCodeFeatures(stripped) {
     {
       feature: "variables",
       pattern: /\b(let|const|var)\b/,
+      messageKey: "variablesLocked",
       message: "变量功能尚未解锁（let/const/var）",
     },
   ];
@@ -527,7 +582,11 @@ async function checkUserCodeFeatures(stripped) {
     if (rule.pattern.test(stripped)) {
       const unlocked = codingFeatures?.[rule.feature];
       if (!unlocked) {
-        send({ type: "error", error: rule.message });
+        const message = getFeatureCheckMessage(
+          rule.messageKey,
+          rule.message
+        );
+        send({ type: "error", error: message });
         return false; // ❌ 不允许继续执行
       }
     }
@@ -648,6 +707,12 @@ onmessage = (e) => {
     }
   } else if (data.type === "init_constants") {
     CONSTANTS = data.constants;
+    return;
+  } else if (data.type === "init_commands") {
+    cropTypeAliases = data.cropTypes || null;
+    buildCropTypeLookup();
+    unlockNameAliases = data.unlockNames || null;
+    featureCheckMessages = data.featureChecks || null;
     return;
   }
 };

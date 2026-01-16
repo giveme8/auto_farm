@@ -10,6 +10,9 @@ const chains = new Map();
 const GLOBAL_CHAIN_KEY = "GLOBAL";
 let codingFeatures = null;
 let CONSTANTS = null;
+let cropTypeAliases = null;
+let cropTypeLookup = new Map();
+let unlockNameAliases = null;
 
 // 默认动作等待帧数
 const actionWaitFrames = {
@@ -44,6 +47,43 @@ function callMain(name, args = [], expectResponse = false) {
     pending.set(reqId, resolve);
     send(msg);
   });
+}
+
+function normalizeCropTypeKey(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function buildCropTypeLookup() {
+  cropTypeLookup = new Map();
+  const aliases = cropTypeAliases || {};
+  for (const [canonical, list] of Object.entries(aliases)) {
+    if (!Array.isArray(list)) continue;
+    const all = list.slice();
+    all.push(canonical);
+    for (const alias of all) {
+      const key = normalizeCropTypeKey(alias);
+      if (!key) continue;
+      cropTypeLookup.set(key, canonical);
+    }
+  }
+}
+
+function resolveCropType(type) {
+  const key = normalizeCropTypeKey(type);
+  if (!key) return type;
+  const resolved = cropTypeLookup?.get(key);
+  if (resolved) return resolved;
+  if (key.endsWith("s")) {
+    const singular = key.slice(0, -1);
+    return cropTypeLookup?.get(singular) || type;
+  }
+  return type;
+}
+
+function getUnlockName(feature) {
+  const aliases = unlockNameAliases?.[feature];
+  if (Array.isArray(aliases) && aliases.length > 0) return aliases[0];
+  return feature;
 }
 
 // ===================== 慢速串行执行队列 =====================
@@ -116,15 +156,16 @@ async function move(direction, entityId) {
 }
 
 async function plant(type, entityId) {
-  if (type == CONSTANTS.CROP_TYPE_NAMES.Carrots) {
+  const resolvedType = resolveCropType(type);
+  if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Carrots) {
     requireFeature(CONSTANTS.UNLOCKS.Carrots);
-  } else if (type == CONSTANTS.CROP_TYPE_NAMES.Trees) {
+  } else if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Trees) {
     requireFeature(CONSTANTS.UNLOCKS.Trees);
-  } else if (type == CONSTANTS.CROP_TYPE_NAMES.Pumpkins) {
+  } else if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Pumpkins) {
     requireFeature(CONSTANTS.UNLOCKS.Pumpkins);
-  } else if (type == CONSTANTS.CROP_TYPE_NAMES.Cactus) {
+  } else if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Cactus) {
     requireFeature(CONSTANTS.UNLOCKS.Cactus);
-  } else if (type == CONSTANTS.CROP_TYPE_NAMES.Sunflowers) {
+  } else if (resolvedType == CONSTANTS.CROP_TYPE_NAMES.Sunflowers) {
     requireFeature(CONSTANTS.UNLOCKS.Sunflowers);
   } else {
     requireFeature(CONSTANTS.UNLOCKS.Plant);
@@ -223,7 +264,7 @@ async function loadCodingFeatures() {
 
 function requireFeature(feature) {
   if (!codingFeatures?.[feature]) {
-    throw new Error(`${CONSTANTS.UNLOCKS_NAME_ZH[feature]} 功能尚未解锁`);
+    throw new Error(`${feature} is not unlocked yet`);
   }
 }
 
@@ -648,6 +689,11 @@ onmessage = (e) => {
     }
   } else if (data.type === "init_constants") {
     CONSTANTS = data.constants;
+    return;
+  } else if (data.type === "init_commands") {
+    cropTypeAliases = data.cropTypes || null;
+    buildCropTypeLookup();
+    unlockNameAliases = data.unlockNames || null;
     return;
   }
 };

@@ -1,4 +1,8 @@
 import { entitiesLayer } from "./layers.js";
+import { getCurrentLocale } from "@/i18n/commands";
+import { translate } from "@/i18n/core";
+
+const t = (key, params) => translate(getCurrentLocale(), key, params);
 
 const droneSprites = new Map();
 
@@ -9,7 +13,12 @@ function getDroneFrames() {
 
   const url = "/images/drone.png";
   const sheet = PIXI.BaseTexture.from(url);
-  console.log("🔍 加载无人机贴图:", sheet.width, sheet.height, sheet.valid);
+  console.log(
+    t("log.loadDroneSheet"),
+    sheet.width,
+    sheet.height,
+    sheet.valid
+  );
   const size = 256;
 
   const buildFrames = () => {
@@ -38,7 +47,7 @@ function getDroneFrames() {
 }
 
 export function updateDrones({ entities, mapSize, tileSize }) {
-  console.log("🔍 更新无人机:", entities.length);
+  console.log(t("log.updateDrones"), entities.length);
   const seen = new Set();
 
   const meta = getDroneFrames();

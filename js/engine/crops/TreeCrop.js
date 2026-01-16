@@ -10,5 +10,5 @@ export class TreeCrop extends CropBase {
     });
   }
 
-  get type() { return '树'; }
+  get type() { return 'tree'; }
 }

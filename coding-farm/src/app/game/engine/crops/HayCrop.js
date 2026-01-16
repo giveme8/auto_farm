@@ -11,6 +11,6 @@ export class HayCrop extends CropBase {
   }
 
   get type() {
-    return "草";
+    return "grass";
   }
 }

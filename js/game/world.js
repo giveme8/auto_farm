@@ -54,7 +54,7 @@ export function setWorldSize(app, size) {
   // 科技限制
   const expandSize = app.unlockManager.getAbilityValue(
     CONSTANTS.UNLOCKS.Expand,
-    "世界尺寸",
+    "unlock.ability.worldSize",
     3
   );
 
@@ -73,4 +73,3 @@ export function setWorldSize(app, size) {
   // 重建世界
   rebuildWorld(app);
 }
-

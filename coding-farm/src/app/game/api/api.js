@@ -1,8 +1,27 @@
 // js/game/api.js
 
-import { CROP_TYPES } from "../engine/crops/CropManager.js";
+import {
+  CROP_TYPES,
+  localizeCropType,
+  resolveCropType,
+} from "../engine/crops/CropManager.js";
 import { Crop } from "../engine/crops/Crop.js";
 import CONSTANTS from "../engine/core/constants.js";
+import { getCurrentLocale } from "@/i18n/commands";
+import { translate } from "@/i18n/core";
+
+const INVENTORY_LABEL_KEYS = {
+  hay: "inventory.hay",
+  wood: "inventory.wood",
+  carrot: "inventory.carrot",
+  pumpkin: "inventory.pumpkin",
+  cactus: "inventory.cactus",
+  gold: "inventory.gold",
+  apple: "inventory.apple",
+  sunflower: "inventory.sunflower",
+  water: "inventory.water",
+  fertilizer: "inventory.fertilizer",
+};
 /**
  * 构建所有游戏 API（供 worker 与 UI 调用）
  */
@@ -14,6 +33,12 @@ export function createGameAPI(app) {
   const unlock = app.unlockManager;
   const inventory = app.inventory;
   const appendSystemLog = app.ui.console.system;
+  const t = (key, params) => translate(getCurrentLocale(), key, params);
+  const getInventoryLabel = (item) => {
+    const labelKey = INVENTORY_LABEL_KEYS[item];
+    if (!labelKey) return item;
+    return t(labelKey);
+  };
   // =====================================================
   // 工具：世界信息
   // =====================================================
@@ -45,7 +70,7 @@ export function createGameAPI(app) {
         inventory.add("gold", reward);
 
         mazeManager.deleteMaze(maze);
-        console.log("宝藏已收集，迷宫删除，奖励:", reward);
+        console.log(t("log.treasureCollected", { reward }));
       }
       return;
     }
@@ -79,7 +104,10 @@ export function createGameAPI(app) {
   function getCropType(id) {
     const e = entityManager.getEntity(id);
     if (!e) return;
-    return cropManager.get(e.x, e.y)?.type;
+    const cropType = cropManager.get(e.x, e.y)?.type;
+    if (!cropType) return;
+    const resolvedType = resolveCropType(cropType);
+    return localizeCropType(resolvedType);
   }
 
   // =====================================================
@@ -105,7 +133,7 @@ export function createGameAPI(app) {
     if (!e) return;
 
     if (inventory.get("water") < 1) {
-      console.log("❌ 水不足");
+      console.log(t("log.insufficientWater"));
       return;
     }
     inventory.remove("water", 1);
@@ -126,8 +154,9 @@ export function createGameAPI(app) {
     if (!e) return;
 
     if (inventory.get("fertilizer") < 1) {
-      console.log("❌ 肥料不足");
-      appendSystemLog("❌ 肥料不足");
+      const msg = t("log.insufficientFertilizer");
+      console.log(msg);
+      appendSystemLog(msg);
       return;
     }
     inventory.remove("fertilizer", 1);
@@ -144,34 +173,53 @@ export function createGameAPI(app) {
     if (mazeManager.isInMaze(e.x, e.y)) return;
     if (cropManager.exist(e.x, e.y)) return;
 
+    const rawType = String(type ?? "").trim();
+    const resolvedType = resolveCropType(rawType);
+    const cropConfig = CROP_TYPES[resolvedType];
+    if (!cropConfig) {
+      const msg = t("log.unknownCropType", { type: rawType });
+      console.warn(msg);
+      appendSystemLog?.(msg);
+      return;
+    }
+
     // 成本检查
-    if (CROP_TYPES[type].cost) {
-      for (const item in CROP_TYPES[type].cost) {
-        const need = CROP_TYPES[type].cost[item];
+    if (cropConfig.cost) {
+      for (const item in cropConfig.cost) {
+        const need = cropConfig.cost[item];
         if (inventory.get(item) < need) {
-          console.log(`❌ 材料不足：${item} ${need}`);
-          appendSystemLog(`❌ 材料不足：${item} ${need}`);
+          const itemLabel = getInventoryLabel(item);
+          const msg = t("log.insufficientMaterials", {
+            item: itemLabel,
+            need,
+          });
+          console.log(msg);
+          appendSystemLog(msg);
           return;
         }
       }
 
-      for (const item in CROP_TYPES[type].cost) {
-        inventory.remove(item, CROP_TYPES[type].cost[item]);
+      for (const item in cropConfig.cost) {
+        inventory.remove(item, cropConfig.cost[item]);
       }
     }
 
-    let matureTime = CROP_TYPES[type]?.time || 0;
+    let matureTime = cropConfig.time || 0;
     if (!soil.gridIsWet(e.x, e.y)) matureTime *= 1.5;
 
     const crop = new Crop({
-      type,
+      type: resolvedType,
       plantedAt: Date.now(),
       matureTime,
       key: `${e.x}_${e.y}`,
     });
 
     // 按科技倍率调整产量
-    const mul = unlock.getAbilityValue(CROP_TYPES[type].unlock, "产量倍率", 1);
+    const mul = unlock.getAbilityValue(
+      cropConfig.unlock,
+      "unlock.ability.yieldMultiplier",
+      1
+    );
     if (mul !== 1) crop.setYieldMultiplier(mul);
 
     cropManager.set(crop);
@@ -220,7 +268,13 @@ export function createGameAPI(app) {
 
     if (Date.now() - crop.plantedAt < crop.matureTime) return false;
 
-    const item = CROP_TYPES[crop.type].item;
+    const resolvedType = resolveCropType(crop.type);
+    const cropConfig = CROP_TYPES[resolvedType];
+    if (!cropConfig) {
+      console.warn(t("log.unknownCropType", { type: crop.type }));
+      return false;
+    }
+    const item = cropConfig.item;
 
     // 合并区域收割
     if (crop.mergeArea) {
@@ -253,12 +307,13 @@ export function createGameAPI(app) {
 
     const limit = unlock.getAbilityValue(
       CONSTANTS.UNLOCKS.Megafarm,
-      "spawn并发数量",
+      "unlock.ability.spawnConcurrency",
       0
     );
     if (count >= limit) {
-      console.log("❌ 分身数量已达上限");
-      appendSystemLog("❌ 分身数量已达上限");
+      const msg = t("log.spawnLimitReached");
+      console.log(msg);
+      appendSystemLog(msg);
       return null;
     }
     return entityManager.spawn(entityManager.activeId).id;
@@ -267,7 +322,7 @@ export function createGameAPI(app) {
   function getMaxEntityCount() {
     return unlock.getAbilityValue(
       CONSTANTS.UNLOCKS.Megafarm,
-      "spawn并发数量",
+      "unlock.ability.spawnConcurrency",
       1
     );
   }
